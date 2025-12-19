@@ -21,8 +21,8 @@ const AdminDashboard = () => {
     );
   }
 
-  // In a real app, you'd check for admin roles here
-  if (!user) {
+  // Check if user is logged in and has the 'admin' role
+  if (!user || user.profile?.role !== 'admin') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-foreground">You need to log in as an administrator to view this page.</p>
@@ -34,7 +34,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-background p-8 text-foreground">
       <div className="container mx-auto">
         <h1 className="text-4xl font-bold mb-8 font-heading">Admin Dashboard</h1>
-        <p className="text-lg mb-4">Welcome, Administrator {user.email}!</p>
+        <p className="text-lg mb-4">Welcome, Administrator {user.profile?.first_name || user.email}!</p>
         <p className="mb-8">This is where administrators will manage clients and data.</p>
         <Button onClick={handleLogout} variant="destructive">
           Logout
