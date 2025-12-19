@@ -27,7 +27,6 @@ const ClientDashboard = () => {
         <p className="text-foreground">You need to log in to view this page.</p>
       </div>
     );
-  );
   }
 
   return (
