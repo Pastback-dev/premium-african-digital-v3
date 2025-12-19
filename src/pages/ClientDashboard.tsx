@@ -21,11 +21,10 @@ const ClientDashboard = () => {
     );
   }
 
-  // Check if user is logged in and has the 'client' role
-  if (!user || user.profile?.role !== 'client') {
+  if (!user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-foreground">You need to log in as a client to view this page.</p>
+        <p className="text-foreground">You need to log in to view this page.</p>
       </div>
     );
   }
@@ -34,7 +33,7 @@ const ClientDashboard = () => {
     <div className="min-h-screen bg-background p-8 text-foreground">
       <div className="container mx-auto">
         <h1 className="text-4xl font-bold mb-8 font-heading">Client Dashboard</h1>
-        <p className="text-lg mb-4">Welcome, {user.profile?.first_name || user.email}!</p>
+        <p className="text-lg mb-4">Welcome, {user.email}!</p>
         <p className="mb-8">This is where clients will access their forms and information.</p>
         <Button onClick={handleLogout} variant="destructive">
           Logout
