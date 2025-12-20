@@ -44,6 +44,12 @@ export const ClientRequestForm = () => {
       return acc;
     }, {} as Record<string, string>)
   );
+  const [knowledgeComments, setKnowledgeComments] = useState(
+    knowledgeCategories.reduce((acc, category) => {
+      acc[category.id] = '';
+      return acc;
+    }, {} as Record<string, string>)
+  );
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -57,6 +63,7 @@ export const ClientRequestForm = () => {
         category: category.name,
         coefficient: category.coefficient,
         rating: knowledgeRatings[category.id],
+        comment: knowledgeComments[category.id],
         percentage: ratingLevels.find(r => r.id === knowledgeRatings[category.id])?.value || 0
       }))
     };
@@ -76,12 +83,25 @@ export const ClientRequestForm = () => {
         return acc;
       }, {} as Record<string, string>)
     );
+    setKnowledgeComments(
+      knowledgeCategories.reduce((acc, category) => {
+        acc[category.id] = '';
+        return acc;
+      }, {} as Record<string, string>)
+    );
   };
 
   const handleRatingChange = (categoryId: string, ratingId: string) => {
     setKnowledgeRatings(prev => ({
       ...prev,
       [categoryId]: ratingId
+    }));
+  };
+
+  const handleCommentChange = (categoryId: string, comment: string) => {
+    setKnowledgeComments(prev => ({
+      ...prev,
+      [categoryId]: comment
     }));
   };
 
@@ -135,7 +155,7 @@ export const ClientRequestForm = () => {
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-3">
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -162,6 +182,21 @@ export const ClientRequestForm = () => {
                         </Label>
                       </div>
                     ))}
+                  </div>
+                  
+                  {/* Commentary input */}
+                  <div className="mt-3">
+                    <Label htmlFor={`comment-${category.id}`} className="block text-xs font-medium text-muted-foreground mb-1.5">
+                      Commentary
+                    </Label>
+                    <Textarea 
+                      id={`comment-${category.id}`}
+                      value={knowledgeComments[category.id]}
+                      onChange={(e) => handleCommentChange(category.id, e.target.value)}
+                      placeholder="Add your commentary for this category..."
+                      rows={2}
+                      className="min-h-[60px] text-sm"
+                    />
                   </div>
                 </div>
               ))}
