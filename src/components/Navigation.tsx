@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import logo from '@/assets/logo.png';
+import { Link } from 'react-router-dom'; // Import Link for navigation
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -56,8 +57,13 @@ export const Navigation = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
+          {/* CTA Buttons */}
+          <div className="hidden lg:flex items-center gap-4">
+            <Link to="/login">
+              <Button variant="ghost" size="lg">
+                Login
+              </Button>
+            </Link>
             <Button variant="premium" size="lg">
               Get in Touch
             </Button>
@@ -93,7 +99,12 @@ export const Navigation = () => {
                   {link.name}
                 </a>
               ))}
-              <Button variant="premium" size="lg" className="mt-4">
+              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="ghost" size="lg" className="w-full">
+                  Login
+                </Button>
+              </Link>
+              <Button variant="premium" size="lg" className="mt-4 w-full">
                 Get in Touch
               </Button>
             </div>
