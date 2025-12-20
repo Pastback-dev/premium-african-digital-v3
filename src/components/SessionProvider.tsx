@@ -2,12 +2,12 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Profile } from '@/types/supabase'; // Import the new Profile type
+import { Profile } from '@/types/supabase';
 
 interface SessionContextType {
   session: Session | null;
   user: User | null;
-  profile: Profile | null; // Add profile to the context
+  profile: Profile | null;
   loading: boolean;
 }
 
@@ -16,10 +16,13 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null); // State for profile
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Define routes that require authentication
+  const protectedRoutes = ['/dashboard/client', '/dashboard/admin'];
 
   // Function to fetch user profile
   const fetchUserProfile = async (userId: string) => {
@@ -55,11 +58,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const currentPath = location.pathname;
 
       if (event === 'SIGNED_OUT') {
+        // If signed out, always redirect to login
         navigate('/login');
       } else if (currentSession) {
         // User is signed in
         if (currentPath === '/login' || currentPath === '/') {
-          // If on login or home page, redirect based on role
+          // If on login or home page, redirect to dashboard based on role
           if (userProfile?.role === 'admin') {
             navigate('/dashboard/admin');
           } else {
@@ -67,10 +71,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
           }
         }
       } else {
-        // No session and not on login page, redirect to login
-        if (currentPath !== '/login') {
+        // No session and not signed in
+        // If trying to access a protected route, redirect to login
+        if (protectedRoutes.some(route => currentPath.startsWith(route))) {
           navigate('/login');
         }
+        // If on '/' or '/login', allow it to render
       }
     };
 
@@ -89,13 +95,22 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       const currentPath = location.pathname;
 
-      if (!initialSession && currentPath !== '/login') {
-        navigate('/login');
-      } else if (initialSession && (currentPath === '/login' || currentPath === '/')) {
-        if (initialUserProfile?.role === 'admin') {
-          navigate('/dashboard/admin');
-        } else {
-          navigate('/dashboard/client');
+      if (!initialSession) {
+        // No initial session
+        // If trying to access a protected route, redirect to login
+        if (protectedRoutes.some(route => currentPath.startsWith(route))) {
+          navigate('/login');
+        }
+        // If on '/' or '/login', allow it to render
+      } else {
+        // Initial session exists
+        if (currentPath === '/login' || currentPath === '/') {
+          // If on login or home page, redirect to dashboard based on role
+          if (initialUserProfile?.role === 'admin') {
+            navigate('/dashboard/admin');
+          } else {
+            navigate('/dashboard/client');
+          }
         }
       }
     });
