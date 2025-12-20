@@ -6,10 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/Login"; // Import the new Login page
-import { SessionProvider } from "./components/SessionProvider"; // Import the new SessionProvider
-import ClientDashboard from "./pages/ClientDashboard"; // Placeholder for client dashboard
-import AdminDashboard from "./pages/AdminDashboard"; // Placeholder for admin dashboard
 
 const queryClient = new QueryClient();
 
@@ -20,16 +16,11 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SessionProvider> {/* Wrap the app with SessionProvider */}
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} /> {/* Login route */}
-              <Route path="/dashboard/client" element={<ClientDashboard />} /> {/* Client Dashboard route */}
-              <Route path="/dashboard/admin" element={<AdminDashboard />} /> {/* Admin Dashboard route */}
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </SessionProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
