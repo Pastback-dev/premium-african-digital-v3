@@ -114,6 +114,30 @@ export const ClientRequestForm = () => {
 
   const { toast } = useToast();
 
+  // Calculate total for SAVOIR
+  const totalSavoir = knowledgeCategories.reduce((total, category) => {
+    const ratingId = knowledgeRatings[category.id];
+    const rating = ratingLevels.find(r => r.id === ratingId);
+    return total + (rating ? (rating.value * category.coefficient) : 0);
+  }, 0);
+
+  // Calculate total for SAVOIR FAIRE
+  const totalSavoirFaire = savoirFaireCategories.reduce((total, category) => {
+    const ratingId = savoirFaireRatings[category.id];
+    const rating = ratingLevels.find(r => r.id === ratingId);
+    return total + (rating ? (rating.value * category.coefficient) : 0);
+  }, 0);
+
+  // Calculate total for SAVOIR ÊTRE
+  const totalSavoirEtre = savoirEtreCategories.reduce((total, category) => {
+    const ratingId = savoirEtreRatings[category.id];
+    const rating = ratingLevels.find(r => r.id === ratingId);
+    return total + (rating ? (rating.value * category.coefficient) : 0);
+  }, 0);
+
+  // Calculate TOTAL TENUE DE POSTE
+  const totalTenueDePoste = totalSavoir + totalSavoirFaire + totalSavoirEtre;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -142,6 +166,7 @@ export const ClientRequestForm = () => {
         comment: savoirEtreComments[category.id],
         percentage: ratingLevels.find(r => r.id === savoirEtreRatings[category.id])?.value || 0
       })),
+      totalTenueDePoste: totalTenueDePoste.toFixed(1) // Include the grand total
     };
     
     console.log('Request submitted:', evaluationData);
@@ -330,12 +355,7 @@ export const ClientRequestForm = () => {
               <div className="flex justify-between items-center">
                 <span className="font-medium text-foreground">Total SAVOIR:</span>
                 <span className="font-bold text-lg sm:text-xl">
-                  {/* Calculate total based on selected ratings */}
-                  {knowledgeCategories.reduce((total, category) => {
-                    const ratingId = knowledgeRatings[category.id];
-                    const rating = ratingLevels.find(r => r.id === ratingId);
-                    return total + (rating ? (rating.value * category.coefficient) : 0);
-                  }, 0).toFixed(1)}%
+                  {totalSavoir.toFixed(1)}%
                 </span>
               </div>
             </div>
@@ -405,12 +425,7 @@ export const ClientRequestForm = () => {
               <div className="flex justify-between items-center">
                 <span className="font-medium text-foreground">Total SAVOIR FAIRE:</span>
                 <span className="font-bold text-lg sm:text-xl">
-                  {/* Calculate total based on selected ratings */}
-                  {savoirFaireCategories.reduce((total, category) => {
-                    const ratingId = savoirFaireRatings[category.id];
-                    const rating = ratingLevels.find(r => r.id === ratingId);
-                    return total + (rating ? (rating.value * category.coefficient) : 0);
-                  }, 0).toFixed(1)}%
+                  {totalSavoirFaire.toFixed(1)}%
                 </span>
               </div>
             </div>
@@ -480,14 +495,19 @@ export const ClientRequestForm = () => {
               <div className="flex justify-between items-center">
                 <span className="font-medium text-foreground">Total SAVOIR ÊTRE:</span>
                 <span className="font-bold text-lg sm:text-xl">
-                  {/* Calculate total based on selected ratings */}
-                  {savoirEtreCategories.reduce((total, category) => {
-                    const ratingId = savoirEtreRatings[category.id];
-                    const rating = ratingLevels.find(r => r.id === ratingId);
-                    return total + (rating ? (rating.value * category.coefficient) : 0);
-                  }, 0).toFixed(1)}%
+                  {totalSavoirEtre.toFixed(1)}%
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* TOTAL TENUE DE POSTE Section */}
+          <div className="border rounded-lg p-4 sm:p-6 bg-primary/10">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground">TOTAL TENUE DE POSTE:</h3>
+              <span className="font-bold text-xl sm:text-2xl text-primary">
+                {totalTenueDePoste.toFixed(1)}%
+              </span>
             </div>
           </div>
           
