@@ -70,7 +70,7 @@ const ratingLevels = [
   { id: 'D', label: 'D', value: 10 }
 ];
 
-export const ClientRequestForm = () => {
+export function ClientRequestForm() { // Changed to named export
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [knowledgeRatings, setKnowledgeRatings] = useState(
