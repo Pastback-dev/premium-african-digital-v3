@@ -255,15 +255,15 @@ export function ClientRequestForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto py-8"> {/* Increased max-width and vertical padding */}
-      <Card className="p-6 sm:p-8 lg:p-10"> {/* Increased card padding */}
-        <CardHeader className="mb-8"> {/* Increased margin-bottom */}
-          <CardTitle className="text-3xl sm:text-4xl font-bold text-foreground">Performance Evaluation Form</CardTitle> {/* Larger title */}
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto py-8">
+      <Card className="p-6 sm:p-8 lg:p-10">
+        <CardHeader className="mb-8">
+          <CardTitle className="text-3xl sm:text-4xl font-bold text-foreground">Performance Evaluation Form</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-10"> {/* Increased space between sections */}
-          <div className="space-y-4"> {/* Spacing for subject/description */}
+        <CardContent className="space-y-10">
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="subject" className="block text-base font-semibold text-foreground mb-2"> {/* Larger label */}
+              <Label htmlFor="subject" className="block text-base font-semibold text-foreground mb-2">
                 Subject
               </Label>
               <Input 
@@ -273,12 +273,12 @@ export function ClientRequestForm() {
                 onChange={(e) => setSubject(e.target.value)} 
                 placeholder="Evaluation subject" 
                 required 
-                className="h-14 text-base px-4 py-3" // Larger input field
+                className="h-14 text-base px-4 py-3"
               />
             </div>
             
             <div>
-              <Label htmlFor="description" className="block text-base font-semibold text-foreground mb-2"> {/* Larger label */}
+              <Label htmlFor="description" className="block text-base font-semibold text-foreground mb-2">
                 Description
               </Label>
               <Textarea 
@@ -286,27 +286,27 @@ export function ClientRequestForm() {
                 value={description} 
                 onChange={(e) => setDescription(e.target.value)} 
                 placeholder="Detailed description of the evaluation" 
-                rows={6} // Increased rows for more space
+                rows={6}
                 required 
-                className="min-h-[150px] text-base px-4 py-3" // Larger textarea
+                className="min-h-[150px] text-base px-4 py-3"
               />
             </div>
           </div>
           
           {/* Knowledge Evaluation Section */}
-          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20"> {/* Increased padding, added subtle background */}
-            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR (Knowledge) - Coefficient: 0.2</h3> {/* Larger heading */}
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR (Knowledge) - Coefficient: 0.2</h3>
             
-            <div className="space-y-8"> {/* Increased space between categories */}
+            <div className="space-y-8">
               {knowledgeCategories.map(category => (
-                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0"> {/* Increased padding */}
-                  <div className="mb-4"> {/* Increased margin-bottom */}
-                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4> {/* Larger category title */}
+                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
+                  <div className="mb-4">
+                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
                     <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid for better responsiveness */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid */}
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -316,18 +316,18 @@ export function ClientRequestForm() {
                           value={level.id}
                           checked={knowledgeRatings[category.id] === level.id}
                           onChange={() => handleRatingChange(category.id, level.id, 'knowledge')}
-                          className="sr-only" // Hide default radio button
+                          className="sr-only"
                         />
                         <Label 
                           htmlFor={`${category.id}-${level.id}`} 
-                          className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg cursor-pointer text-center w-full h-full transition-all duration-200 border
+                          className={`flex flex-col items-center justify-center p-4 sm:p-5 rounded-lg cursor-pointer text-center w-full min-w-[70px] min-h-[70px] transition-all duration-200 border
                             ${knowledgeRatings[category.id] === level.id 
                               ? 'bg-primary text-primary-foreground border-primary shadow-md' 
                               : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-sm sm:text-base font-medium">{level.label}</span> {/* Larger text */}
-                          <span className="text-xs text-muted-foreground mt-1">
+                          <span className="text-base sm:text-lg font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-xs sm:text-sm text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
                         </Label>
@@ -336,7 +336,7 @@ export function ClientRequestForm() {
                   </div>
                   
                   {/* Commentary input */}
-                  <div className="mt-4"> {/* Increased margin-top */}
+                  <div className="mt-4">
                     <Label htmlFor={`comment-${category.id}`} className="block text-sm font-medium text-muted-foreground mb-2">
                       Commentary
                     </Label>
@@ -345,17 +345,17 @@ export function ClientRequestForm() {
                       value={knowledgeComments[category.id]}
                       onChange={(e) => handleCommentChange(category.id, e.target.value, 'knowledge')}
                       placeholder="Add your commentary for this category..."
-                      rows={3} // Increased rows
-                      className="min-h-[80px] text-sm px-4 py-3" // Larger textarea
+                      rows={3}
+                      className="min-h-[80px] text-sm px-4 py-3"
                     />
                   </div>
                 </div>
               ))}
             </div>
             
-            <div className="mt-6 pt-4 border-t border-border"> {/* Increased margin-top and padding-top */}
+            <div className="mt-6 pt-4 border-t border-border">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-lg text-foreground">Total SAVOIR:</span> {/* Larger text */}
+                <span className="font-semibold text-lg text-foreground">Total SAVOIR:</span>
                 <span className="font-bold text-xl sm:text-2xl text-primary">
                   {totalSavoir.toFixed(1)}%
                 </span>
@@ -364,19 +364,19 @@ export function ClientRequestForm() {
           </div>
 
           {/* SAVOIR FAIRE Evaluation Section */}
-          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20"> {/* Increased padding, added subtle background */}
-            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR FAIRE (Know-how / Skills) - Coefficient: 0.5</h3> {/* Larger heading */}
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR FAIRE (Know-how / Skills) - Coefficient: 0.5</h3>
             
-            <div className="space-y-8"> {/* Increased space between categories */}
+            <div className="space-y-8">
               {savoirFaireCategories.map(category => (
-                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0"> {/* Increased padding */}
-                  <div className="mb-4"> {/* Increased margin-bottom */}
-                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4> {/* Larger category title */}
+                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
+                  <div className="mb-4">
+                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
                     <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid for better responsiveness */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid */}
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -386,18 +386,18 @@ export function ClientRequestForm() {
                           value={level.id}
                           checked={savoirFaireRatings[category.id] === level.id}
                           onChange={() => handleRatingChange(category.id, level.id, 'savoirFaire')}
-                          className="sr-only" // Hide default radio button
+                          className="sr-only"
                         />
                         <Label 
                           htmlFor={`${category.id}-${level.id}`} 
-                          className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg cursor-pointer text-center w-full h-full transition-all duration-200 border
+                          className={`flex flex-col items-center justify-center p-4 sm:p-5 rounded-lg cursor-pointer text-center w-full min-w-[70px] min-h-[70px] transition-all duration-200 border
                             ${savoirFaireRatings[category.id] === level.id 
                               ? 'bg-primary text-primary-foreground border-primary shadow-md' 
                               : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-sm sm:text-base font-medium">{level.label}</span> {/* Larger text */}
-                          <span className="text-xs text-muted-foreground mt-1">
+                          <span className="text-base sm:text-lg font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-xs sm:text-sm text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
                         </Label>
@@ -406,7 +406,7 @@ export function ClientRequestForm() {
                   </div>
                   
                   {/* Commentary input */}
-                  <div className="mt-4"> {/* Increased margin-top */}
+                  <div className="mt-4">
                     <Label htmlFor={`comment-${category.id}`} className="block text-sm font-medium text-muted-foreground mb-2">
                       Commentary
                     </Label>
@@ -415,17 +415,17 @@ export function ClientRequestForm() {
                       value={savoirFaireComments[category.id]}
                       onChange={(e) => handleCommentChange(category.id, e.target.value, 'savoirFaire')}
                       placeholder="Add your commentary for this category..."
-                      rows={3} // Increased rows
-                      className="min-h-[80px] text-sm px-4 py-3" // Larger textarea
+                      rows={3}
+                      className="min-h-[80px] text-sm px-4 py-3"
                     />
                   </div>
                 </div>
               ))}
             </div>
             
-            <div className="mt-6 pt-4 border-t border-border"> {/* Increased margin-top and padding-top */}
+            <div className="mt-6 pt-4 border-t border-border">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-lg text-foreground">Total SAVOIR FAIRE:</span> {/* Larger text */}
+                <span className="font-semibold text-lg text-foreground">Total SAVOIR FAIRE:</span>
                 <span className="font-bold text-xl sm:text-2xl text-primary">
                   {totalSavoirFaire.toFixed(1)}%
                 </span>
@@ -434,19 +434,19 @@ export function ClientRequestForm() {
           </div>
 
           {/* SAVOIR ÊTRE Evaluation Section */}
-          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20"> {/* Increased padding, added subtle background */}
-            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR ÊTRE (Attitude / Soft Skills) - Coefficient: 0.3</h3> {/* Larger heading */}
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR ÊTRE (Attitude / Soft Skills) - Coefficient: 0.3</h3>
             
-            <div className="space-y-8"> {/* Increased space between categories */}
+            <div className="space-y-8">
               {savoirEtreCategories.map(category => (
-                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0"> {/* Increased padding */}
-                  <div className="mb-4"> {/* Increased margin-bottom */}
-                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4> {/* Larger category title */}
+                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
+                  <div className="mb-4">
+                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
                     <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid for better responsiveness */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid */}
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -456,18 +456,18 @@ export function ClientRequestForm() {
                           value={level.id}
                           checked={savoirEtreRatings[category.id] === level.id}
                           onChange={() => handleRatingChange(category.id, level.id, 'savoirEtre')}
-                          className="sr-only" // Hide default radio button
+                          className="sr-only"
                         />
                         <Label 
                           htmlFor={`${category.id}-${level.id}`} 
-                          className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg cursor-pointer text-center w-full h-full transition-all duration-200 border
+                          className={`flex flex-col items-center justify-center p-4 sm:p-5 rounded-lg cursor-pointer text-center w-full min-w-[70px] min-h-[70px] transition-all duration-200 border
                             ${savoirEtreRatings[category.id] === level.id 
                               ? 'bg-primary text-primary-foreground border-primary shadow-md' 
                               : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-sm sm:text-base font-medium">{level.label}</span> {/* Larger text */}
-                          <span className="text-xs text-muted-foreground mt-1">
+                          <span className="text-base sm:text-lg font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-xs sm:text-sm text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
                         </Label>
@@ -476,7 +476,7 @@ export function ClientRequestForm() {
                   </div>
                   
                   {/* Commentary input */}
-                  <div className="mt-4"> {/* Increased margin-top */}
+                  <div className="mt-4">
                     <Label htmlFor={`comment-${category.id}`} className="block text-sm font-medium text-muted-foreground mb-2">
                       Commentary
                     </Label>
@@ -485,17 +485,17 @@ export function ClientRequestForm() {
                       value={savoirEtreComments[category.id]}
                       onChange={(e) => handleCommentChange(category.id, e.target.value, 'savoirEtre')}
                       placeholder="Add your commentary for this category..."
-                      rows={3} // Increased rows
-                      className="min-h-[80px] text-sm px-4 py-3" // Larger textarea
+                      rows={3}
+                      className="min-h-[80px] text-sm px-4 py-3"
                     />
                   </div>
                 </div>
               ))}
             </div>
             
-            <div className="mt-6 pt-4 border-t border-border"> {/* Increased margin-top and padding-top */}
+            <div className="mt-6 pt-4 border-t border-border">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-lg text-foreground">Total SAVOIR ÊTRE:</span> {/* Larger text */}
+                <span className="font-semibold text-lg text-foreground">Total SAVOIR ÊTRE:</span>
                 <span className="font-bold text-xl sm:text-2xl text-primary">
                   {totalSavoirEtre.toFixed(1)}%
                 </span>
@@ -504,16 +504,16 @@ export function ClientRequestForm() {
           </div>
 
           {/* TOTAL TENUE DE POSTE Section */}
-          <div className="border rounded-lg p-6 sm:p-8 bg-primary/10"> {/* Increased padding, distinct background */}
+          <div className="border rounded-lg p-6 sm:p-8 bg-primary/10">
             <div className="flex justify-between items-center">
-              <h3 className="text-xl sm:text-2xl font-bold text-foreground">TOTAL TENUE DE POSTE:</h3> {/* Larger heading */}
-              <span className="font-bold text-2xl sm:text-3xl text-primary"> {/* Larger total */}
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground">TOTAL TENUE DE POSTE:</h3>
+              <span className="font-bold text-2xl sm:text-3xl text-primary">
                 {totalTenueDePoste.toFixed(1)}%
               </span>
             </div>
           </div>
           
-          <Button type="submit" className="w-full h-14 text-lg font-semibold"> {/* Larger button */}
+          <Button type="submit" className="w-full h-14 text-lg font-semibold">
             Submit Evaluation
           </Button>
         </CardContent>
