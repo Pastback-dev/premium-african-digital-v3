@@ -89,11 +89,11 @@ export const ClientRequestForm = () => {
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Performance Evaluation Form</CardTitle>
+          <CardTitle className="text-2xl">Performance Evaluation Form</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <Label htmlFor="subject" className="block text-sm font-medium text-muted-foreground mb-1">
+            <Label htmlFor="subject" className="block text-sm font-medium text-muted-foreground mb-2">
               Subject
             </Label>
             <Input 
@@ -103,11 +103,12 @@ export const ClientRequestForm = () => {
               onChange={(e) => setSubject(e.target.value)} 
               placeholder="Evaluation subject" 
               required 
+              className="h-12"
             />
           </div>
           
           <div>
-            <Label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-1">
+            <Label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-2">
               Description
             </Label>
             <Textarea 
@@ -117,24 +118,26 @@ export const ClientRequestForm = () => {
               placeholder="Detailed description of the evaluation" 
               rows={5} 
               required 
+              className="min-h-[120px]"
             />
           </div>
           
           {/* Knowledge Evaluation Section */}
-          <div className="border rounded-lg p-6">
-            <h3 className="text-xl font-semibold mb-6">SAVOIR (Knowledge) - Coefficient: 0.2</h3>
+          <div className="border rounded-lg p-4 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">SAVOIR (Knowledge) - Coefficient: 0.2</h3>
             
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {knowledgeCategories.map(category => (
-                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
-                  <div className="mb-4">
-                    <h4 className="text-lg font-medium text-foreground">{category.name}</h4>
-                    <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                <div key={category.id} className="border-b border-border pb-4 sm:pb-6 last:border-0 last:pb-0">
+                  <div className="mb-3 sm:mb-4">
+                    <h4 className="text-base sm:text-lg font-medium text-foreground">{category.name}</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
                   </div>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+                  {/* Rating options - responsive grid */}
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
                     {ratingLevels.map(level => (
-                      <div key={level.id} className="flex items-center">
+                      <div key={level.id} className="flex flex-col items-center">
                         <input
                           type="radio"
                           id={`${category.id}-${level.id}`}
@@ -142,13 +145,20 @@ export const ClientRequestForm = () => {
                           value={level.id}
                           checked={knowledgeRatings[category.id] === level.id}
                           onChange={() => handleRatingChange(category.id, level.id)}
-                          className="h-4 w-4 text-primary focus:ring-primary"
+                          className="h-4 w-4 text-primary focus:ring-primary sr-only"
                         />
                         <Label 
                           htmlFor={`${category.id}-${level.id}`} 
-                          className="ml-2 text-sm font-medium text-foreground cursor-pointer"
+                          className={`flex flex-col items-center justify-center p-2 rounded-md cursor-pointer text-center w-full transition-colors
+                            ${knowledgeRatings[category.id] === level.id 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'bg-muted hover:bg-muted/80'}
+                          `}
                         >
-                          {level.label} <span className="text-muted-foreground">({level.value}%)</span>
+                          <span className="text-xs sm:text-sm font-medium">{level.label}</span>
+                          <span className="text-[0.6rem] sm:text-xs text-muted-foreground mt-1">
+                            ({level.value}%)
+                          </span>
                         </Label>
                       </div>
                     ))}
@@ -157,10 +167,10 @@ export const ClientRequestForm = () => {
               ))}
             </div>
             
-            <div className="mt-6 pt-4 border-t border-border">
+            <div className="mt-4 sm:mt-6 pt-4 border-t border-border">
               <div className="flex justify-between items-center">
-                <span className="font-medium">Total SAVOIR:</span>
-                <span className="font-bold text-lg">
+                <span className="font-medium text-foreground">Total SAVOIR:</span>
+                <span className="font-bold text-lg sm:text-xl">
                   {/* Calculate total based on selected ratings */}
                   {knowledgeCategories.reduce((total, category) => {
                     const ratingId = knowledgeRatings[category.id];
@@ -172,7 +182,7 @@ export const ClientRequestForm = () => {
             </div>
           </div>
           
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full h-12 text-base">
             Submit Evaluation
           </Button>
         </CardContent>
