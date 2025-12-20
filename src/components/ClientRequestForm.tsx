@@ -25,6 +25,21 @@ const knowledgeCategories = [
   }
 ];
 
+// SAVOIR FAIRE evaluation data structure
+const savoirFaireCategories = [
+  { id: 'gestion-paie', name: 'Gestion de la paie', coefficient: 0.5 },
+  { id: 'gestion-budgetaire', name: 'Gestion budgétaire', coefficient: 0.5 },
+  { id: 'developpement-rh', name: 'Développement RH', coefficient: 0.5 },
+  { id: 'ingenierie-formation', name: 'Ingénierie de formation', coefficient: 0.5 },
+  { id: 'gestion-appareils', name: 'Gestion des appareils', coefficient: 0.5 },
+  { id: 'application-si', name: 'Application Système d\'information', coefficient: 0.5 },
+  { id: 'fiabilite-donnees', name: 'Fiabilité des données', coefficient: 0.5 },
+  { id: 'preparation-etats', name: 'Préparation des états et documents de synthèse', coefficient: 0.5 },
+  { id: 'preparation-resultats', name: 'Préparation des résultats et points périodiques', coefficient: 0.5 },
+  { id: 'respect-delais', name: 'Respect des délais et engagements', coefficient: 0.5 },
+  { id: 'respect-procedures', name: 'Respect des procédures', coefficient: 0.5 },
+];
+
 const ratingLevels = [
   { id: 'A+', label: 'A+', value: 100 },
   { id: 'A', label: 'A', value: 90 },
@@ -50,6 +65,20 @@ export const ClientRequestForm = () => {
       return acc;
     }, {} as Record<string, string>)
   );
+
+  const [savoirFaireRatings, setSavoirFaireRatings] = useState(
+    savoirFaireCategories.reduce((acc, category) => {
+      acc[category.id] = '';
+      return acc;
+    }, {} as Record<string, string>)
+  );
+  const [savoirFaireComments, setSavoirFaireComments] = useState(
+    savoirFaireCategories.reduce((acc, category) => {
+      acc[category.id] = '';
+      return acc;
+    }, {} as Record<string, string>)
+  );
+
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -65,7 +94,14 @@ export const ClientRequestForm = () => {
         rating: knowledgeRatings[category.id],
         comment: knowledgeComments[category.id],
         percentage: ratingLevels.find(r => r.id === knowledgeRatings[category.id])?.value || 0
-      }))
+      })),
+      savoirFaireEvaluations: savoirFaireCategories.map(category => ({
+        category: category.name,
+        coefficient: category.coefficient,
+        rating: savoirFaireRatings[category.id],
+        comment: savoirFaireComments[category.id],
+        percentage: ratingLevels.find(r => r.id === savoirFaireRatings[category.id])?.value || 0
+      })),
     };
     
     console.log('Request submitted:', evaluationData);
@@ -89,20 +125,46 @@ export const ClientRequestForm = () => {
         return acc;
       }, {} as Record<string, string>)
     );
+    setSavoirFaireRatings(
+      savoirFaireCategories.reduce((acc, category) => {
+        acc[category.id] = '';
+        return acc;
+      }, {} as Record<string, string>)
+    );
+    setSavoirFaireComments(
+      savoirFaireCategories.reduce((acc, category) => {
+        acc[category.id] = '';
+        return acc;
+      }, {} as Record<string, string>)
+    );
   };
 
-  const handleRatingChange = (categoryId: string, ratingId: string) => {
-    setKnowledgeRatings(prev => ({
-      ...prev,
-      [categoryId]: ratingId
-    }));
+  const handleRatingChange = (categoryId: string, ratingId: string, type: 'knowledge' | 'savoirFaire') => {
+    if (type === 'knowledge') {
+      setKnowledgeRatings(prev => ({
+        ...prev,
+        [categoryId]: ratingId
+      }));
+    } else {
+      setSavoirFaireRatings(prev => ({
+        ...prev,
+        [categoryId]: ratingId
+      }));
+    }
   };
 
-  const handleCommentChange = (categoryId: string, comment: string) => {
-    setKnowledgeComments(prev => ({
-      ...prev,
-      [categoryId]: comment
-    }));
+  const handleCommentChange = (categoryId: string, comment: string, type: 'knowledge' | 'savoirFaire') => {
+    if (type === 'knowledge') {
+      setKnowledgeComments(prev => ({
+        ...prev,
+        [categoryId]: comment
+      }));
+    } else {
+      setSavoirFaireComments(prev => ({
+        ...prev,
+        [categoryId]: comment
+      }));
+    }
   };
 
   return (
@@ -164,7 +226,7 @@ export const ClientRequestForm = () => {
                           name={`rating-${category.id}`}
                           value={level.id}
                           checked={knowledgeRatings[category.id] === level.id}
-                          onChange={() => handleRatingChange(category.id, level.id)}
+                          onChange={() => handleRatingChange(category.id, level.id, 'knowledge')}
                           className="h-4 w-4 text-primary focus:ring-primary sr-only"
                         />
                         <Label 
@@ -192,7 +254,7 @@ export const ClientRequestForm = () => {
                     <Textarea 
                       id={`comment-${category.id}`}
                       value={knowledgeComments[category.id]}
-                      onChange={(e) => handleCommentChange(category.id, e.target.value)}
+                      onChange={(e) => handleCommentChange(category.id, e.target.value, 'knowledge')}
                       placeholder="Add your commentary for this category..."
                       rows={2}
                       className="min-h-[60px] text-sm"
@@ -209,6 +271,81 @@ export const ClientRequestForm = () => {
                   {/* Calculate total based on selected ratings */}
                   {knowledgeCategories.reduce((total, category) => {
                     const ratingId = knowledgeRatings[category.id];
+                    const rating = ratingLevels.find(r => r.id === ratingId);
+                    return total + (rating ? (rating.value * category.coefficient) : 0);
+                  }, 0).toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* SAVOIR FAIRE Evaluation Section */}
+          <div className="border rounded-lg p-4 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">SAVOIR FAIRE (Know-how / Skills) - Coefficient: 0.5</h3>
+            
+            <div className="space-y-6 sm:space-y-8">
+              {savoirFaireCategories.map(category => (
+                <div key={category.id} className="border-b border-border pb-4 sm:pb-6 last:border-0 last:pb-0">
+                  <div className="mb-3 sm:mb-4">
+                    <h4 className="text-base sm:text-lg font-medium text-foreground">{category.name}</h4>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                  </div>
+                  
+                  {/* Rating options - responsive grid */}
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-3">
+                    {ratingLevels.map(level => (
+                      <div key={level.id} className="flex flex-col items-center">
+                        <input
+                          type="radio"
+                          id={`${category.id}-${level.id}`}
+                          name={`rating-${category.id}`}
+                          value={level.id}
+                          checked={savoirFaireRatings[category.id] === level.id}
+                          onChange={() => handleRatingChange(category.id, level.id, 'savoirFaire')}
+                          className="h-4 w-4 text-primary focus:ring-primary sr-only"
+                        />
+                        <Label 
+                          htmlFor={`${category.id}-${level.id}`} 
+                          className={`flex flex-col items-center justify-center p-2 rounded-md cursor-pointer text-center w-full transition-colors
+                            ${savoirFaireRatings[category.id] === level.id 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'bg-muted hover:bg-muted/80'}
+                          `}
+                        >
+                          <span className="text-xs sm:text-sm font-medium">{level.label}</span>
+                          <span className="text-[0.6rem] sm:text-xs text-muted-foreground mt-1">
+                            ({level.value}%)
+                          </span>
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Commentary input */}
+                  <div className="mt-3">
+                    <Label htmlFor={`comment-${category.id}`} className="block text-xs font-medium text-muted-foreground mb-1.5">
+                      Commentary
+                    </Label>
+                    <Textarea 
+                      id={`comment-${category.id}`}
+                      value={savoirFaireComments[category.id]}
+                      onChange={(e) => handleCommentChange(category.id, e.target.value, 'savoirFaire')}
+                      placeholder="Add your commentary for this category..."
+                      rows={2}
+                      className="min-h-[60px] text-sm"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-4 sm:mt-6 pt-4 border-t border-border">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-foreground">Total SAVOIR FAIRE:</span>
+                <span className="font-bold text-lg sm:text-xl">
+                  {/* Calculate total based on selected ratings */}
+                  {savoirFaireCategories.reduce((total, category) => {
+                    const ratingId = savoirFaireRatings[category.id];
                     const rating = ratingLevels.find(r => r.id === ratingId);
                     return total + (rating ? (rating.value * category.coefficient) : 0);
                   }, 0).toFixed(1)}%
