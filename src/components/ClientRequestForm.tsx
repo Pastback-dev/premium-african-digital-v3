@@ -70,7 +70,7 @@ const ratingLevels = [
   { id: 'D', label: 'D', value: 10 }
 ];
 
-export function ClientRequestForm() { // Changed to named export
+export function ClientRequestForm() {
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [knowledgeRatings, setKnowledgeRatings] = useState(
@@ -255,56 +255,58 @@ export function ClientRequestForm() { // Changed to named export
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Performance Evaluation Form</CardTitle>
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto py-8"> {/* Increased max-width and vertical padding */}
+      <Card className="p-6 sm:p-8 lg:p-10"> {/* Increased card padding */}
+        <CardHeader className="mb-8"> {/* Increased margin-bottom */}
+          <CardTitle className="text-3xl sm:text-4xl font-bold text-foreground">Performance Evaluation Form</CardTitle> {/* Larger title */}
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <Label htmlFor="subject" className="block text-sm font-medium text-muted-foreground mb-2">
-              Subject
-            </Label>
-            <Input 
-              id="subject" 
-              type="text" 
-              value={subject} 
-              onChange={(e) => setSubject(e.target.value)} 
-              placeholder="Evaluation subject" 
-              required 
-              className="h-12"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-2">
-              Description
-            </Label>
-            <Textarea 
-              id="description" 
-              value={description} 
-              onChange={(e) => setDescription(e.target.value)} 
-              placeholder="Detailed description of the evaluation" 
-              rows={5} 
-              required 
-              className="min-h-[120px]"
-            />
+        <CardContent className="space-y-10"> {/* Increased space between sections */}
+          <div className="space-y-4"> {/* Spacing for subject/description */}
+            <div>
+              <Label htmlFor="subject" className="block text-base font-semibold text-foreground mb-2"> {/* Larger label */}
+                Subject
+              </Label>
+              <Input 
+                id="subject" 
+                type="text" 
+                value={subject} 
+                onChange={(e) => setSubject(e.target.value)} 
+                placeholder="Evaluation subject" 
+                required 
+                className="h-14 text-base px-4 py-3" // Larger input field
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="description" className="block text-base font-semibold text-foreground mb-2"> {/* Larger label */}
+                Description
+              </Label>
+              <Textarea 
+                id="description" 
+                value={description} 
+                onChange={(e) => setDescription(e.target.value)} 
+                placeholder="Detailed description of the evaluation" 
+                rows={6} // Increased rows for more space
+                required 
+                className="min-h-[150px] text-base px-4 py-3" // Larger textarea
+              />
+            </div>
           </div>
           
           {/* Knowledge Evaluation Section */}
-          <div className="border rounded-lg p-4 sm:p-6">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">SAVOIR (Knowledge) - Coefficient: 0.2</h3>
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20"> {/* Increased padding, added subtle background */}
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR (Knowledge) - Coefficient: 0.2</h3> {/* Larger heading */}
             
-            <div className="space-y-6 sm:space-y-8">
+            <div className="space-y-8"> {/* Increased space between categories */}
               {knowledgeCategories.map(category => (
-                <div key={category.id} className="border-b border-border pb-4 sm:pb-6 last:border-0 last:pb-0">
-                  <div className="mb-3 sm:mb-4">
-                    <h4 className="text-base sm:text-lg font-medium text-foreground">{category.name}</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0"> {/* Increased padding */}
+                  <div className="mb-4"> {/* Increased margin-bottom */}
+                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4> {/* Larger category title */}
+                    <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid for better responsiveness */}
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -314,18 +316,18 @@ export function ClientRequestForm() { // Changed to named export
                           value={level.id}
                           checked={knowledgeRatings[category.id] === level.id}
                           onChange={() => handleRatingChange(category.id, level.id, 'knowledge')}
-                          className="h-4 w-4 text-primary focus:ring-primary sr-only"
+                          className="sr-only" // Hide default radio button
                         />
                         <Label 
                           htmlFor={`${category.id}-${level.id}`} 
-                          className={`flex flex-col items-center justify-center p-2 rounded-md cursor-pointer text-center w-full transition-colors
+                          className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg cursor-pointer text-center w-full h-full transition-all duration-200 border
                             ${knowledgeRatings[category.id] === level.id 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'bg-muted hover:bg-muted/80'}
+                              ? 'bg-primary text-primary-foreground border-primary shadow-md' 
+                              : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-xs sm:text-sm font-medium">{level.label}</span>
-                          <span className="text-[0.6rem] sm:text-xs text-muted-foreground mt-1">
+                          <span className="text-sm sm:text-base font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-xs text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
                         </Label>
@@ -334,8 +336,8 @@ export function ClientRequestForm() { // Changed to named export
                   </div>
                   
                   {/* Commentary input */}
-                  <div className="mt-3">
-                    <Label htmlFor={`comment-${category.id}`} className="block text-xs font-medium text-muted-foreground mb-1.5">
+                  <div className="mt-4"> {/* Increased margin-top */}
+                    <Label htmlFor={`comment-${category.id}`} className="block text-sm font-medium text-muted-foreground mb-2">
                       Commentary
                     </Label>
                     <Textarea 
@@ -343,18 +345,18 @@ export function ClientRequestForm() { // Changed to named export
                       value={knowledgeComments[category.id]}
                       onChange={(e) => handleCommentChange(category.id, e.target.value, 'knowledge')}
                       placeholder="Add your commentary for this category..."
-                      rows={2}
-                      className="min-h-[60px] text-sm"
+                      rows={3} // Increased rows
+                      className="min-h-[80px] text-sm px-4 py-3" // Larger textarea
                     />
                   </div>
                 </div>
               ))}
             </div>
             
-            <div className="mt-4 sm:mt-6 pt-4 border-t border-border">
+            <div className="mt-6 pt-4 border-t border-border"> {/* Increased margin-top and padding-top */}
               <div className="flex justify-between items-center">
-                <span className="font-medium text-foreground">Total SAVOIR:</span>
-                <span className="font-bold text-lg sm:text-xl">
+                <span className="font-semibold text-lg text-foreground">Total SAVOIR:</span> {/* Larger text */}
+                <span className="font-bold text-xl sm:text-2xl text-primary">
                   {totalSavoir.toFixed(1)}%
                 </span>
               </div>
@@ -362,19 +364,19 @@ export function ClientRequestForm() { // Changed to named export
           </div>
 
           {/* SAVOIR FAIRE Evaluation Section */}
-          <div className="border rounded-lg p-4 sm:p-6">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">SAVOIR FAIRE (Know-how / Skills) - Coefficient: 0.5</h3>
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20"> {/* Increased padding, added subtle background */}
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR FAIRE (Know-how / Skills) - Coefficient: 0.5</h3> {/* Larger heading */}
             
-            <div className="space-y-6 sm:space-y-8">
+            <div className="space-y-8"> {/* Increased space between categories */}
               {savoirFaireCategories.map(category => (
-                <div key={category.id} className="border-b border-border pb-4 sm:pb-6 last:border-0 last:pb-0">
-                  <div className="mb-3 sm:mb-4">
-                    <h4 className="text-base sm:text-lg font-medium text-foreground">{category.name}</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0"> {/* Increased padding */}
+                  <div className="mb-4"> {/* Increased margin-bottom */}
+                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4> {/* Larger category title */}
+                    <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid for better responsiveness */}
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -384,18 +386,18 @@ export function ClientRequestForm() { // Changed to named export
                           value={level.id}
                           checked={savoirFaireRatings[category.id] === level.id}
                           onChange={() => handleRatingChange(category.id, level.id, 'savoirFaire')}
-                          className="h-4 w-4 text-primary focus:ring-primary sr-only"
+                          className="sr-only" // Hide default radio button
                         />
                         <Label 
                           htmlFor={`${category.id}-${level.id}`} 
-                          className={`flex flex-col items-center justify-center p-2 rounded-md cursor-pointer text-center w-full transition-colors
+                          className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg cursor-pointer text-center w-full h-full transition-all duration-200 border
                             ${savoirFaireRatings[category.id] === level.id 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'bg-muted hover:bg-muted/80'}
+                              ? 'bg-primary text-primary-foreground border-primary shadow-md' 
+                              : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-xs sm:text-sm font-medium">{level.label}</span>
-                          <span className="text-[0.6rem] sm:text-xs text-muted-foreground mt-1">
+                          <span className="text-sm sm:text-base font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-xs text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
                         </Label>
@@ -404,8 +406,8 @@ export function ClientRequestForm() { // Changed to named export
                   </div>
                   
                   {/* Commentary input */}
-                  <div className="mt-3">
-                    <Label htmlFor={`comment-${category.id}`} className="block text-xs font-medium text-muted-foreground mb-1.5">
+                  <div className="mt-4"> {/* Increased margin-top */}
+                    <Label htmlFor={`comment-${category.id}`} className="block text-sm font-medium text-muted-foreground mb-2">
                       Commentary
                     </Label>
                     <Textarea 
@@ -413,18 +415,18 @@ export function ClientRequestForm() { // Changed to named export
                       value={savoirFaireComments[category.id]}
                       onChange={(e) => handleCommentChange(category.id, e.target.value, 'savoirFaire')}
                       placeholder="Add your commentary for this category..."
-                      rows={2}
-                      className="min-h-[60px] text-sm"
+                      rows={3} // Increased rows
+                      className="min-h-[80px] text-sm px-4 py-3" // Larger textarea
                     />
                   </div>
                 </div>
               ))}
             </div>
             
-            <div className="mt-4 sm:mt-6 pt-4 border-t border-border">
+            <div className="mt-6 pt-4 border-t border-border"> {/* Increased margin-top and padding-top */}
               <div className="flex justify-between items-center">
-                <span className="font-medium text-foreground">Total SAVOIR FAIRE:</span>
-                <span className="font-bold text-lg sm:text-xl">
+                <span className="font-semibold text-lg text-foreground">Total SAVOIR FAIRE:</span> {/* Larger text */}
+                <span className="font-bold text-xl sm:text-2xl text-primary">
                   {totalSavoirFaire.toFixed(1)}%
                 </span>
               </div>
@@ -432,19 +434,19 @@ export function ClientRequestForm() { // Changed to named export
           </div>
 
           {/* SAVOIR ÊTRE Evaluation Section */}
-          <div className="border rounded-lg p-4 sm:p-6">
-            <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">SAVOIR ÊTRE (Attitude / Soft Skills) - Coefficient: 0.3</h3>
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20"> {/* Increased padding, added subtle background */}
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR ÊTRE (Attitude / Soft Skills) - Coefficient: 0.3</h3> {/* Larger heading */}
             
-            <div className="space-y-6 sm:space-y-8">
+            <div className="space-y-8"> {/* Increased space between categories */}
               {savoirEtreCategories.map(category => (
-                <div key={category.id} className="border-b border-border pb-4 sm:pb-6 last:border-0 last:pb-0">
-                  <div className="mb-3 sm:mb-4">
-                    <h4 className="text-base sm:text-lg font-medium text-foreground">{category.name}</h4>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0"> {/* Increased padding */}
+                  <div className="mb-4"> {/* Increased margin-bottom */}
+                    <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4> {/* Larger category title */}
+                    <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-3">
+                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid for better responsiveness */}
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -454,18 +456,18 @@ export function ClientRequestForm() { // Changed to named export
                           value={level.id}
                           checked={savoirEtreRatings[category.id] === level.id}
                           onChange={() => handleRatingChange(category.id, level.id, 'savoirEtre')}
-                          className="h-4 w-4 text-primary focus:ring-primary sr-only"
+                          className="sr-only" // Hide default radio button
                         />
                         <Label 
                           htmlFor={`${category.id}-${level.id}`} 
-                          className={`flex flex-col items-center justify-center p-2 rounded-md cursor-pointer text-center w-full transition-colors
+                          className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg cursor-pointer text-center w-full h-full transition-all duration-200 border
                             ${savoirEtreRatings[category.id] === level.id 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'bg-muted hover:bg-muted/80'}
+                              ? 'bg-primary text-primary-foreground border-primary shadow-md' 
+                              : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-xs sm:text-sm font-medium">{level.label}</span>
-                          <span className="text-[0.6rem] sm:text-xs text-muted-foreground mt-1">
+                          <span className="text-sm sm:text-base font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-xs text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
                         </Label>
@@ -474,8 +476,8 @@ export function ClientRequestForm() { // Changed to named export
                   </div>
                   
                   {/* Commentary input */}
-                  <div className="mt-3">
-                    <Label htmlFor={`comment-${category.id}`} className="block text-xs font-medium text-muted-foreground mb-1.5">
+                  <div className="mt-4"> {/* Increased margin-top */}
+                    <Label htmlFor={`comment-${category.id}`} className="block text-sm font-medium text-muted-foreground mb-2">
                       Commentary
                     </Label>
                     <Textarea 
@@ -483,18 +485,18 @@ export function ClientRequestForm() { // Changed to named export
                       value={savoirEtreComments[category.id]}
                       onChange={(e) => handleCommentChange(category.id, e.target.value, 'savoirEtre')}
                       placeholder="Add your commentary for this category..."
-                      rows={2}
-                      className="min-h-[60px] text-sm"
+                      rows={3} // Increased rows
+                      className="min-h-[80px] text-sm px-4 py-3" // Larger textarea
                     />
                   </div>
                 </div>
               ))}
             </div>
             
-            <div className="mt-4 sm:mt-6 pt-4 border-t border-border">
+            <div className="mt-6 pt-4 border-t border-border"> {/* Increased margin-top and padding-top */}
               <div className="flex justify-between items-center">
-                <span className="font-medium text-foreground">Total SAVOIR ÊTRE:</span>
-                <span className="font-bold text-lg sm:text-xl">
+                <span className="font-semibold text-lg text-foreground">Total SAVOIR ÊTRE:</span> {/* Larger text */}
+                <span className="font-bold text-xl sm:text-2xl text-primary">
                   {totalSavoirEtre.toFixed(1)}%
                 </span>
               </div>
@@ -502,16 +504,16 @@ export function ClientRequestForm() { // Changed to named export
           </div>
 
           {/* TOTAL TENUE DE POSTE Section */}
-          <div className="border rounded-lg p-4 sm:p-6 bg-primary/10">
+          <div className="border rounded-lg p-6 sm:p-8 bg-primary/10"> {/* Increased padding, distinct background */}
             <div className="flex justify-between items-center">
-              <h3 className="text-lg sm:text-xl font-semibold text-foreground">TOTAL TENUE DE POSTE:</h3>
-              <span className="font-bold text-xl sm:text-2xl text-primary">
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground">TOTAL TENUE DE POSTE:</h3> {/* Larger heading */}
+              <span className="font-bold text-2xl sm:text-3xl text-primary"> {/* Larger total */}
                 {totalTenueDePoste.toFixed(1)}%
               </span>
             </div>
           </div>
           
-          <Button type="submit" className="w-full h-12 text-base">
+          <Button type="submit" className="w-full h-14 text-lg font-semibold"> {/* Larger button */}
             Submit Evaluation
           </Button>
         </CardContent>
