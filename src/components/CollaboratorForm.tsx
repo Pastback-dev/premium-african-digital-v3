@@ -28,13 +28,13 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
-  fullName: z.string().min(2, { message: 'Full Name must be at least 2 characters.' }),
-  function: z.string().min(2, { message: 'Function must be at least 2 characters.' }),
-  category: z.string().min(2, { message: 'Category must be at least 2 characters.' }),
-  entryDate: z.date({ required_error: 'Entry Date is required.' }),
-  seniorityDate: z.date({ required_error: 'Seniority Date is required.' }),
+  fullName: z.string().min(2, { message: 'Le nom et prénom doivent contenir au moins 2 caractères.' }),
+  function: z.string().min(2, { message: 'La fonction doit contenir au moins 2 caractères.' }),
+  category: z.string().min(2, { message: 'La catégorie doit contenir au moins 2 caractères.' }),
+  entryDate: z.date({ required_error: "La date d'entrée est requise." }),
+  seniorityDate: z.date({ required_error: "La date d'ancienneté est requise." }),
 }).refine((data) => data.seniorityDate >= data.entryDate, {
-  message: "Seniority Date cannot be before Entry Date.",
+  message: "La date d'ancienneté ne peut pas être antérieure à la date d'entrée.",
   path: ["seniorityDate"],
 });
 
@@ -54,7 +54,7 @@ export const CollaboratorForm = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user) {
-      toast.error('You must be logged in to submit collaborator information.');
+      toast.error('Vous devez être connecté pour soumettre les informations du collaborateur.');
       return;
     }
 
@@ -71,9 +71,9 @@ export const CollaboratorForm = () => {
 
     if (error) {
       console.error('Error submitting collaborator:', error);
-      toast.error('Failed to submit collaborator information. Please try again.');
+      toast.error('Échec de la soumission des informations du collaborateur. Veuillez réessayer.');
     } else {
-      toast.success('Collaborator information submitted successfully!');
+      toast.success('Informations du collaborateur soumises avec succès !');
       form.reset();
     }
   }
@@ -81,10 +81,10 @@ export const CollaboratorForm = () => {
   return (
     <div className="max-w-3xl mx-auto p-8 rounded-lg border border-border bg-card shadow-lg mt-12">
       <h2 className="text-3xl font-bold text-foreground mb-6 text-center font-heading">
-        Add Collaborator
+        Ajouter un Collaborateur
       </h2>
       <p className="text-muted-foreground mb-8 text-center">
-        Enter the details for a new collaborator.
+        Saisissez les détails du nouveau collaborateur.
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -93,9 +93,9 @@ export const CollaboratorForm = () => {
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Full Name</FormLabel>
+                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Nom et Prénom</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} />
+                  <Input placeholder="Jean Dupont" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -106,9 +106,9 @@ export const CollaboratorForm = () => {
             name="function"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Function</FormLabel>
+                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Fonction</FormLabel>
                 <FormControl>
-                  <Input placeholder="Sales Manager" {...field} />
+                  <Input placeholder="Responsable Commercial" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -119,20 +119,20 @@ export const CollaboratorForm = () => {
             name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Category</FormLabel>
+                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Catégorie</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder="Sélectionner une catégorie" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="executive">Executive</SelectItem>
-                    <SelectItem value="management">Management</SelectItem>
-                    <SelectItem value="technical">Technical</SelectItem>
-                    <SelectItem value="sales">Sales</SelectItem>
+                    <SelectItem value="executive">Direction</SelectItem>
+                    <SelectItem value="management">Gestion</SelectItem>
+                    <SelectItem value="technical">Technique</SelectItem>
+                    <SelectItem value="sales">Ventes</SelectItem>
                     <SelectItem value="support">Support</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="other">Autre</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -144,7 +144,7 @@ export const CollaboratorForm = () => {
             name="entryDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Entry Date</FormLabel>
+                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Date d'entrée</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -158,7 +158,7 @@ export const CollaboratorForm = () => {
                         {field.value ? (
                           format(field.value, "PPP")
                         ) : (
-                          <span>Pick a date</span>
+                          <span>Sélectionner une date</span>
                         )}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
@@ -182,7 +182,7 @@ export const CollaboratorForm = () => {
             name="seniorityDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Seniority Date</FormLabel>
+                <FormLabel className="text-sm font-medium text-foreground font-heading uppercase tracking-wider">Date d'ancienneté</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -196,7 +196,7 @@ export const CollaboratorForm = () => {
                         {field.value ? (
                           format(field.value, "PPP")
                         ) : (
-                          <span>Pick a date</span>
+                          <span>Sélectionner une date</span>
                         )}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
@@ -216,7 +216,7 @@ export const CollaboratorForm = () => {
             )}
           />
           <Button type="submit" variant="premium" size="lg" className="w-full group">
-            Add Collaborator
+            Ajouter le Collaborateur
             <UserPlus className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
         </form>
