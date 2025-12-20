@@ -27,7 +27,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (_event === 'SIGNED_OUT') {
         navigate('/login');
       } else if (_event === 'SIGNED_IN' && session) {
-        navigate('/'); // Redirect to home or dashboard after sign in
+        navigate('/dashboard/client'); // Redirect to client dashboard after sign in
       }
     });
 

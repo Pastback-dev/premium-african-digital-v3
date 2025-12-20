@@ -10,8 +10,8 @@ const Login = () => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        // User is signed in, redirect to home or dashboard
-        navigate('/'); 
+        // User is signed in, redirect to client dashboard
+        navigate('/dashboard/client'); 
       }
     });
 
@@ -51,7 +51,7 @@ const Login = () => {
             },
           }}
           theme="dark" // Using dark theme to match the app's aesthetic
-          redirectTo={window.location.origin} // Redirects to the current origin after auth
+          redirectTo={window.location.origin + '/dashboard/client'} // Redirects to the client dashboard after auth
         />
       </div>
     </div>
