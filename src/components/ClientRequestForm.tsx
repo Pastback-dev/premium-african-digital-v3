@@ -23,7 +23,9 @@ export const ClientRequestForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-6 border border-border rounded-lg bg-card">
       <div>
-        <label htmlFor="subject" className="block text-sm font-medium text-muted-foreground mb-1">Subject</label>
+        <label htmlFor="subject" className="block text-sm font-medium text-muted-foreground mb-1">
+          Subject
+        </label>
         <Input
           id="subject"
           type="text"
@@ -34,7 +36,9 @@ export const ClientRequestForm = () => {
         />
       </div>
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-1">Description</label>
+        <label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-1">
+          Description
+        </label>
         <Textarea
           id="description"
           value={description}
@@ -44,7 +48,9 @@ export const ClientRequestForm = () => {
           required
         />
       </div>
-      <Button type="submit" className="w-full">Submit Request</Button>
+      <Button type="submit" className="w-full">
+        Submit Request
+      </Button>
     </form>
   );
 };
