@@ -3,6 +3,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Profile } from '@/types/supabase';
+import { toast } from 'sonner'; // Import toast for notifications
 
 interface SessionContextType {
   session: Session | null;
@@ -33,12 +34,17 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       .eq('id', userId)
       .single();
 
-    if (error) {
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "No rows found"
       console.error('Error fetching profile:', error);
-      setProfile(null);
+      toast.error(`Échec du chargement du profil utilisateur: ${error.message}`);
       return null;
     }
-    console.log('Profile fetched:', data);
+    if (!data) {
+      console.warn('Aucun profil trouvé pour l\'utilisateur:', userId);
+      toast.warning('Votre profil n\'a pas pu être chargé. Veuillez contacter le support si cela persiste.');
+      return null;
+    }
+    console.log('Profil récupéré:', data);
     return data as Profile;
   };
 
@@ -63,25 +69,22 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       console.log('Current path:', currentPath, 'User profile role:', userProfile?.role);
 
       if (event === 'SIGNED_OUT') {
-        console.log('Redirecting to /login due to SIGNED_OUT event.');
+        console.log('Redirection vers /login suite à l\'événement SIGNED_OUT.');
         navigate('/login');
       } else if (currentSession) {
         // User is signed in
         if (currentPath === '/login' || currentPath === '/') {
           // If on login or home page, redirect to dashboard based on role
-          if (userProfile?.role === 'admin') {
-            console.log('Redirecting to /dashboard/admin.');
-            navigate('/dashboard/admin');
-          } else {
-            console.log('Redirecting to /dashboard/client.');
-            navigate('/dashboard/client');
-          }
+          // If profile is null, default to client dashboard
+          const targetPath = userProfile?.role === 'admin' ? '/dashboard/admin' : '/dashboard/client';
+          console.log(`Redirection vers ${targetPath}.`);
+          navigate(targetPath);
         }
       } else {
         // No session and not signed in
         // If trying to access a protected route, redirect to login
         if (protectedRoutes.some(route => currentPath.startsWith(route))) {
-          console.log('Redirecting to /login as no session and on protected route.');
+          console.log('Redirection vers /login car aucune session et sur une route protégée.');
           navigate('/login');
         }
         // If on '/' or '/login', allow it to render
@@ -92,7 +95,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Initial session check
     supabase.auth.getSession().then(async ({ data: { session: initialSession } }) => {
-      console.log('Initial session check. Session:', initialSession);
+      console.log('Vérification de la session initiale. Session:', initialSession);
       let initialUserProfile: Profile | null = null;
       if (initialSession?.user) {
         initialUserProfile = await fetchUserProfile(initialSession.user.id);
@@ -103,13 +106,13 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setLoading(false); // Set loading to false after initial session check
 
       const currentPath = location.pathname;
-      console.log('Initial check current path:', currentPath, 'Initial user profile role:', initialUserProfile?.role);
+      console.log('Vérification initiale du chemin actuel:', currentPath, 'Rôle du profil utilisateur initial:', initialUserProfile?.role);
 
       if (!initialSession) {
         // No initial session
         // If trying to access a protected route, redirect to login
         if (protectedRoutes.some(route => currentPath.startsWith(route))) {
-          console.log('Initial check: Redirecting to /login as no initial session and on protected route.');
+          console.log('Vérification initiale: Redirection vers /login car aucune session initiale et sur une route protégée.');
           navigate('/login');
         }
         // If on '/' or '/login', allow it to render
@@ -117,19 +120,16 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         // Initial session exists
         if (currentPath === '/login' || currentPath === '/') {
           // If on login or home page, redirect to dashboard based on role
-          if (initialUserProfile?.role === 'admin') {
-            console.log('Initial check: Redirecting to /dashboard/admin.');
-            navigate('/dashboard/admin');
-          } else {
-            console.log('Initial check: Redirecting to /dashboard/client.');
-            navigate('/dashboard/client');
-          }
+          // If profile is null, default to client dashboard
+          const targetPath = initialUserProfile?.role === 'admin' ? '/dashboard/admin' : '/dashboard/client';
+          console.log(`Vérification initiale: Redirection vers ${targetPath}.`);
+          navigate(targetPath);
         }
       }
     });
 
     return () => {
-      console.log('SessionProvider useEffect cleanup.');
+      console.log('Nettoyage de SessionProvider useEffect.');
       authListener.subscription.unsubscribe();
     };
   }, [navigate, location.pathname]);
