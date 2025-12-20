@@ -10,8 +10,9 @@ const Login = () => {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        // User is signed in, redirect to client dashboard
-        navigate('/dashboard/client'); 
+        // Role-based redirection is now handled in SessionProvider
+        // We'll let SessionProvider handle the redirection
+        console.log('User signed in, SessionProvider will handle redirection');
       }
     });
 
@@ -28,7 +29,7 @@ const Login = () => {
         </h2>
         <Auth
           supabaseClient={supabase}
-          providers={[]} // You can add 'google', 'github', etc. here if needed
+          providers={[]}
           appearance={{
             theme: ThemeSupa,
             variables: {
@@ -50,8 +51,8 @@ const Login = () => {
               },
             },
           }}
-          theme="dark" // Using dark theme to match the app's aesthetic
-          redirectTo={window.location.origin + '/dashboard/client'} // Redirects to the client dashboard after auth
+          theme="dark"
+          redirectTo={window.location.origin}
         />
       </div>
     </div>

@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 import logo from '@/assets/logo.png';
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Link } from 'react-router-dom';
+import { useSession } from './SessionProvider';
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -17,6 +18,7 @@ const navLinks = [
 export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { session, userRole } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +27,8 @@ export const Navigation = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const dashboardLink = userRole === 'admin' ? '/dashboard/admin' : '/dashboard/client';
 
   return (
     <motion.header
@@ -59,14 +63,20 @@ export const Navigation = () => {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <Link to="/login">
-              <Button variant="ghost" size="lg">
-                Login
-              </Button>
-            </Link>
-            <Button variant="premium" size="lg">
-              Get in Touch
-            </Button>
+            {session ? (
+              <Link to={dashboardLink}>
+                <Button variant="ghost" size="lg">
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/login">
+                <Button variant="ghost" size="lg">
+                  Login
+                </Button>
+              </Link>
+            )}
+            <Button variant="premium" size="lg">Get in Touch</Button>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -99,11 +109,21 @@ export const Navigation = () => {
                   {link.name}
                 </a>
               ))}
-              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button variant="ghost" size="lg" className="w-full">
-                  Login
-                </Button>
-              </Link>
+              
+              {session ? (
+                <Link to={dashboardLink} onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="ghost" size="lg" className="w-full">
+                    Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="ghost" size="lg" className="w-full">
+                    Login
+                  </Button>
+                </Link>
+              )}
+              
               <Button variant="premium" size="lg" className="mt-4 w-full">
                 Get in Touch
               </Button>

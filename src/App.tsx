@@ -6,9 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/Login"; // Import the new Login page
-import { SessionProvider } from "./components/SessionProvider"; // Import SessionProvider
-import ClientDashboard from "./pages/ClientDashboard"; // Import ClientDashboard
+import Login from "./pages/Login";
+import { SessionProvider } from "./components/SessionProvider";
+import ClientDashboard from "./pages/ClientDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -19,11 +20,12 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SessionProvider> {/* Wrap Routes with SessionProvider */}
+          <SessionProvider>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} /> {/* Add the Login route */}
-              <Route path="/dashboard/client" element={<ClientDashboard />} /> {/* Add ClientDashboard route */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/dashboard/client" element={<ClientDashboard />} />
+              <Route path="/dashboard/admin" element={<AdminDashboard />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
