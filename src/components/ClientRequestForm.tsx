@@ -4,6 +4,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Label } from './ui/label';
 
 // Knowledge evaluation data structure
 const knowledgeCategories = [
@@ -92,9 +93,9 @@ export const ClientRequestForm = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-muted-foreground mb-1">
+            <Label htmlFor="subject" className="block text-sm font-medium text-muted-foreground mb-1">
               Subject
-            </label>
+            </Label>
             <Input 
               id="subject" 
               type="text" 
@@ -106,9 +107,9 @@ export const ClientRequestForm = () => {
           </div>
           
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-1">
+            <Label htmlFor="description" className="block text-sm font-medium text-muted-foreground mb-1">
               Description
-            </label>
+            </Label>
             <Textarea 
               id="description" 
               value={description} 
@@ -120,60 +121,43 @@ export const ClientRequestForm = () => {
           </div>
           
           {/* Knowledge Evaluation Section */}
-          <div className="border rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-4">SAVOIR (Knowledge) - Coefficient: 0.2</h3>
+          <div className="border rounded-lg p-6">
+            <h3 className="text-xl font-semibold mb-6">SAVOIR (Knowledge) - Coefficient: 0.2</h3>
             
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 px-4">SAVOIR COEF.</th>
-                    <th className="text-left py-2 px-4">Niveau de notation</th>
+            <div className="space-y-8">
+              {knowledgeCategories.map(category => (
+                <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
+                  <div className="mb-4">
+                    <h4 className="text-lg font-medium text-foreground">{category.name}</h4>
+                    <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
                     {ratingLevels.map(level => (
-                      <th key={level.id} className="text-center py-2 px-2 text-xs">
-                        {level.label}<br />
-                        <span className="text-muted-foreground">({level.value}%)</span>
-                      </th>
+                      <div key={level.id} className="flex items-center">
+                        <input
+                          type="radio"
+                          id={`${category.id}-${level.id}`}
+                          name={`rating-${category.id}`}
+                          value={level.id}
+                          checked={knowledgeRatings[category.id] === level.id}
+                          onChange={() => handleRatingChange(category.id, level.id)}
+                          className="h-4 w-4 text-primary focus:ring-primary"
+                        />
+                        <Label 
+                          htmlFor={`${category.id}-${level.id}`} 
+                          className="ml-2 text-sm font-medium text-foreground cursor-pointer"
+                        >
+                          {level.label} <span className="text-muted-foreground">({level.value}%)</span>
+                        </Label>
+                      </div>
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {knowledgeCategories.map(category => (
-                    <tr key={category.id} className="border-b hover:bg-muted/50">
-                      <td className="py-3 px-4">
-                        <div>
-                          <div className="font-medium">{category.name}</div>
-                          <div className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex flex-wrap gap-1">
-                          {ratingLevels.map(level => (
-                            <span key={level.id} className="text-xs bg-muted px-2 py-1 rounded">
-                              {level.label}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      {ratingLevels.map(level => (
-                        <td key={level.id} className="text-center py-3 px-2">
-                          <input
-                            type="radio"
-                            name={`rating-${category.id}`}
-                            value={level.id}
-                            checked={knowledgeRatings[category.id] === level.id}
-                            onChange={() => handleRatingChange(category.id, level.id)}
-                            className="h-4 w-4"
-                          />
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </div>
+                </div>
+              ))}
             </div>
             
-            <div className="mt-4 pt-4 border-t">
+            <div className="mt-6 pt-4 border-t border-border">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Total SAVOIR:</span>
                 <span className="font-bold text-lg">
