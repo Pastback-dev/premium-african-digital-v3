@@ -6,58 +6,51 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
 
-// Knowledge evaluation data structure
+// Define section coefficients
+const SAVOIR_COEFFICIENT = 0.2;
+const SAVOIR_FAIRE_COEFFICIENT = 0.5;
+const SAVOIR_ETRE_COEFFICIENT = 0.3;
+
+// Knowledge evaluation data structure (coefficients removed from individual categories)
 const knowledgeCategories = [
-  { 
-    id: 'administration-rh', 
-    name: 'Administration des Ressources Humaines', 
-    coefficient: 0.2 
-  },
-  { 
-    id: 'legislation-travail', 
-    name: 'Maîtrise de la législation de travail', 
-    coefficient: 0.2 
-  },
-  { 
-    id: 'gestion-rh', 
-    name: 'Gestion des Ressources Humaines', 
-    coefficient: 0.2 
-  }
+  { id: 'administration-rh', name: 'Administration des Ressources Humaines' },
+  { id: 'legislation-travail', name: 'Maîtrise de la législation de travail' },
+  { id: 'gestion-rh', name: 'Gestion des Ressources Humaines' }
 ];
 
-// SAVOIR FAIRE evaluation data structure
+// SAVOIR FAIRE evaluation data structure (coefficients removed from individual categories)
 const savoirFaireCategories = [
-  { id: 'gestion-paie', name: 'Gestion de la paie', coefficient: 0.5 },
-  { id: 'gestion-budgetaire', name: 'Gestion budgétaire', coefficient: 0.5 },
-  { id: 'developpement-rh', name: 'Développement RH', coefficient: 0.5 },
-  { id: 'ingenierie-formation', name: 'Ingénierie de formation', coefficient: 0.5 },
-  { id: 'gestion-appareils', name: 'Gestion des appareils', coefficient: 0.5 },
-  { id: 'application-si', name: 'Application Système d\'information', coefficient: 0.5 },
-  { id: 'fiabilite-donnees', name: 'Fiabilité des données', coefficient: 0.5 },
-  { id: 'preparation-etats', name: 'Préparation des états et documents de synthèse', coefficient: 0.5 },
-  { id: 'preparation-resultats', name: 'Préparation des résultats et points périodiques', coefficient: 0.5 },
-  { id: 'respect-delais', name: 'Respect des délais et engagements', coefficient: 0.5 },
-  { id: 'respect-procedures', name: 'Respect des procédures', coefficient: 0.5 },
+  { id: 'gestion-paie', name: 'Gestion de la paie' },
+  { id: 'gestion-budgetaire', name: 'Gestion budgétaire' },
+  { id: 'developpement-rh', name: 'Développement RH' },
+  { id: 'ingenierie-formation', name: 'Ingénierie de formation' },
+  { id: 'gestion-appareils', name: 'Gestion des appareils' },
+  { id: 'application-si', name: 'Application Système d\'information' },
+  { id: 'fiabilite-donnees', name: 'Fiabilité des données' },
+  { id: 'preparation-etats', name: 'Préparation des états et documents de synthèse' },
+  { id: 'preparation-resultats', name: 'Préparation des résultats et points périodique' },
+  { id: 'respect-delais', name: 'Respect des délais et engagements' },
+  { id: 'respect-procedures', name: 'Respect des procédures' },
 ];
 
-// SAVOIR ÊTRE evaluation data structure
+// SAVOIR ÊTRE evaluation data structure (coefficients removed from individual categories)
 const savoirEtreCategories = [
-  { id: 'assiduite', name: 'Assiduitė', coefficient: 0.3 },
-  { id: 'attitudes-positives', name: 'Attitudes positives', coefficient: 0.3 },
-  { id: 'communication-environnement', name: 'Communication avec son environnement', coefficient: 0.3 },
-  { id: 'creativite', name: 'Créativité (Valeur Groupe)', coefficient: 0.3 },
-  { id: 'determination-perseverance', name: 'Détermination / Persévérance', coefficient: 0.3 },
-  { id: 'discretion-confidentialite', name: 'Discrétion / Confidentialité', coefficient: 0.3 },
-  { id: 'engagement-disponibilite-implication', name: 'Engagement / Disponibilité / Implication', coefficient: 0.3 },
-  { id: 'esprit-equipe-cooperation', name: 'Esprit d\'équipe / Coopération', coefficient: 0.3 },
-  { id: 'esprit-initiative-autonomie', name: 'Esprit d\'initiative / Force de proposition /Autonomie', coefficient: 0.3 },
-  { id: 'exemplarite', name: 'Exemplarité (Valeur Groupe)', coefficient: 0.3 },
-  { id: 'gestion-priorites', name: 'Gestion des priorités', coefficient: 0.3 },
-  { id: 'humilite', name: 'Humilité (Valeur Groupe)', coefficient: 0.3 },
-  { id: 'reactivite-orientation-resultats', name: 'Réactivité / Orientation résultats', coefficient: 0.3 },
-  { id: 'remise-en-cause', name: 'Remise en cause', coefficient: 0.3 },
-  { id: 'respect', name: 'Respect (Valeur Groupe)', coefficient: 0.3 },
-  { id: 'rigueur-organisation-methode', name: 'Rigueur / Organisation / Méthode', coefficient: 0.3 },
+  { id: 'assiduite', name: 'Assiduitė' },
+  { id: 'attitudes-positives', name: 'Attitudes positives' },
+  { id: 'communication-environnement', name: 'Communication avec son environnement' },
+  { id: 'creativite', name: 'Créativité (Valeur Groupe)' },
+  { id: 'determination-perseverance', name: 'Détermination / Persévérance' },
+  { id: 'discretion-confidentialite', name: 'Discrétion / Confidentialité' },
+  { id: 'engagement-disponibilite-implication', name: 'Engagement / Disponibilité / Implication' },
+  { id: 'esprit-equipe-cooperation', name: 'Esprit d\'équipe / Coopération' },
+  { id: 'esprit-initiative-autonomie', name: 'Esprit d\'initiative / Force de proposition /Autonomie' },
+  { id: 'exemplarite', name: 'Exemplarité (Valeur Groupe)' },
+  { id: 'gestion-priorites', name: 'Gestion des priorités' },
+  { id: 'humilite', name: 'Humilité (Valeur Groupe)' },
+  { id: 'reactivite-orientation-resultats', name: 'Réactivité / Orientation résultats' },
+  { id: 'remise-en-cause', name: 'Remise en cause' },
+  { id: 'respect', name: 'Respect (Valeur Groupe)' },
+  { id: 'rigueur-organisation-methode', name: 'Rigueur / Organisation / Méthode' },
 ];
 
 const ratingLevels = [
@@ -114,29 +107,35 @@ export function ClientRequestForm() {
 
   const { toast } = useToast();
 
-  // Calculate total for SAVOIR
-  const totalSavoir = knowledgeCategories.reduce((total, category) => {
+  // Calculate total for SAVOIR (sum of percentages / number of categories)
+  const totalSavoirSum = knowledgeCategories.reduce((total, category) => {
     const ratingId = knowledgeRatings[category.id];
     const rating = ratingLevels.find(r => r.id === ratingId);
-    return total + (rating ? (rating.value * category.coefficient) : 0);
+    return total + (rating ? rating.value : 0);
   }, 0);
+  const totalSavoir = knowledgeCategories.length > 0 ? totalSavoirSum / knowledgeCategories.length : 0;
 
-  // Calculate total for SAVOIR FAIRE
-  const totalSavoirFaire = savoirFaireCategories.reduce((total, category) => {
+  // Calculate total for SAVOIR FAIRE (sum of percentages / number of categories)
+  const totalSavoirFaireSum = savoirFaireCategories.reduce((total, category) => {
     const ratingId = savoirFaireRatings[category.id];
     const rating = ratingLevels.find(r => r.id === ratingId);
-    return total + (rating ? (rating.value * category.coefficient) : 0);
+    return total + (rating ? rating.value : 0);
   }, 0);
+  const totalSavoirFaire = savoirFaireCategories.length > 0 ? totalSavoirFaireSum / savoirFaireCategories.length : 0;
 
-  // Calculate total for SAVOIR ÊTRE
-  const totalSavoirEtre = savoirEtreCategories.reduce((total, category) => {
+  // Calculate total for SAVOIR ÊTRE (sum of percentages / number of categories)
+  const totalSavoirEtreSum = savoirEtreCategories.reduce((total, category) => {
     const ratingId = savoirEtreRatings[category.id];
     const rating = ratingLevels.find(r => r.id === ratingId);
-    return total + (rating ? (rating.value * category.coefficient) : 0);
+    return total + (rating ? rating.value : 0);
   }, 0);
+  const totalSavoirEtre = savoirEtreCategories.length > 0 ? totalSavoirEtreSum / savoirEtreCategories.length : 0;
 
-  // Calculate TOTAL TENUE DE POSTE
-  const totalTenueDePoste = totalSavoir + totalSavoirFaire + totalSavoirEtre;
+  // Calculate TOTAL TENUE DE POSTE (applying coefficients to section totals)
+  const totalTenueDePoste = 
+    (totalSavoir * SAVOIR_COEFFICIENT) + 
+    (totalSavoirFaire * SAVOIR_FAIRE_COEFFICIENT) + 
+    (totalSavoirEtre * SAVOIR_ETRE_COEFFICIENT);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,26 +146,26 @@ export function ClientRequestForm() {
       description,
       knowledgeEvaluations: knowledgeCategories.map(category => ({
         category: category.name,
-        coefficient: category.coefficient,
         rating: knowledgeRatings[category.id],
         comment: knowledgeComments[category.id],
         percentage: ratingLevels.find(r => r.id === knowledgeRatings[category.id])?.value || 0
       })),
       savoirFaireEvaluations: savoirFaireCategories.map(category => ({
         category: category.name,
-        coefficient: category.coefficient,
         rating: savoirFaireRatings[category.id],
         comment: savoirFaireComments[category.id],
         percentage: ratingLevels.find(r => r.id === savoirFaireRatings[category.id])?.value || 0
       })),
       savoirEtreEvaluations: savoirEtreCategories.map(category => ({
         category: category.name,
-        coefficient: category.coefficient,
         rating: savoirEtreRatings[category.id],
         comment: savoirEtreComments[category.id],
         percentage: ratingLevels.find(r => r.id === savoirEtreRatings[category.id])?.value || 0
       })),
-      totalTenueDePoste: totalTenueDePoste.toFixed(1) // Include the grand total
+      totalSavoir: totalSavoir.toFixed(1),
+      totalSavoirFaire: totalSavoirFaire.toFixed(1),
+      totalSavoirEtre: totalSavoirEtre.toFixed(1),
+      totalTenueDePoste: totalTenueDePoste.toFixed(1)
     };
     
     console.log('Request submitted:', evaluationData);
@@ -295,18 +294,18 @@ export function ClientRequestForm() {
           
           {/* Knowledge Evaluation Section */}
           <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
-            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR (Knowledge) - Coefficient: 0.2</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR (Knowledge) - Coefficient: {SAVOIR_COEFFICIENT}</h3>
             
             <div className="space-y-8">
               {knowledgeCategories.map(category => (
                 <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
                   <div className="mb-4">
                     <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
-                    <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                    {/* Removed individual category coefficient display */}
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4">
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -326,7 +325,7 @@ export function ClientRequestForm() {
                               : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-base sm:text-lg font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-base sm:text-lg font-medium">{level.label}</span>
                           <span className="text-xs sm:text-sm text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
@@ -365,18 +364,18 @@ export function ClientRequestForm() {
 
           {/* SAVOIR FAIRE Evaluation Section */}
           <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
-            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR FAIRE (Know-how / Skills) - Coefficient: 0.5</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR FAIRE (Know-how / Skills) - Coefficient: {SAVOIR_FAIRE_COEFFICIENT}</h3>
             
             <div className="space-y-8">
               {savoirFaireCategories.map(category => (
                 <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
                   <div className="mb-4">
                     <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
-                    <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                    {/* Removed individual category coefficient display */}
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4">
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -396,7 +395,7 @@ export function ClientRequestForm() {
                               : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-base sm:text-lg font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-base sm:text-lg font-medium">{level.label}</span>
                           <span className="text-xs sm:text-sm text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
@@ -435,18 +434,18 @@ export function ClientRequestForm() {
 
           {/* SAVOIR ÊTRE Evaluation Section */}
           <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
-            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR ÊTRE (Attitude / Soft Skills) - Coefficient: 0.3</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">SAVOIR ÊTRE (Attitude / Soft Skills) - Coefficient: {SAVOIR_ETRE_COEFFICIENT}</h3>
             
             <div className="space-y-8">
               {savoirEtreCategories.map(category => (
                 <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
                   <div className="mb-4">
                     <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
-                    <p className="text-sm text-muted-foreground">Coefficient: {category.coefficient}</p>
+                    {/* Removed individual category coefficient display */}
                   </div>
                   
                   {/* Rating options - responsive grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4"> {/* Adjusted grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-4">
                     {ratingLevels.map(level => (
                       <div key={level.id} className="flex flex-col items-center">
                         <input
@@ -466,7 +465,7 @@ export function ClientRequestForm() {
                               : 'bg-card text-muted-foreground border-border hover:bg-muted/50 hover:text-foreground'}
                           `}
                         >
-                          <span className="text-base sm:text-lg font-medium">{level.label}</span> {/* Larger text */}
+                          <span className="text-base sm:text-lg font-medium">{level.label}</span>
                           <span className="text-xs sm:text-sm text-muted-foreground mt-1">
                             ({level.value}%)
                           </span>
