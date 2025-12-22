@@ -109,6 +109,7 @@ export function ClientRequestForm() {
   // New state for Synthèse section
   const [strongPoints, setStrongPoints] = useState<string[]>(['', '', '']); // Min 3
   const [areasToImprove, setAreasToImprove] = useState<string[]>(['', '', '']); // Min 3
+  const [developmentPlans, setDevelopmentPlans] = useState<string[]>(['']); // Min 1
 
   const { toast } = useToast();
 
@@ -162,6 +163,14 @@ export function ClientRequestForm() {
       });
       return;
     }
+    if (developmentPlans.filter(Boolean).length < 1) {
+      toast({
+        title: "Validation Error",
+        description: "Please provide at least 1 'Développement à envisager'.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     // Prepare evaluation data
     const evaluationData = {
@@ -191,6 +200,7 @@ export function ClientRequestForm() {
       totalTenueDePoste: totalTenueDePoste.toFixed(1),
       strongPoints: strongPoints.filter(Boolean), // Filter out empty strings
       areasToImprove: areasToImprove.filter(Boolean), // Filter out empty strings
+      developmentPlans: developmentPlans.filter(Boolean), // Filter out empty strings
     };
     
     console.log('Request submitted:', evaluationData);
@@ -240,6 +250,7 @@ export function ClientRequestForm() {
     );
     setStrongPoints(['', '', '']);
     setAreasToImprove(['', '', '']);
+    setDevelopmentPlans(['']);
   };
 
   const handleRatingChange = (categoryId: string, ratingId: string, type: 'knowledge' | 'savoirFaire' | 'savoirEtre') => {
@@ -318,6 +329,26 @@ export function ClientRequestForm() {
 
   const updateAreaToImprove = (index: number, value: string) => {
     setAreasToImprove(prev => prev.map((item, i) => (i === index ? value : item)));
+  };
+
+  const addDevelopmentPlan = () => {
+    setDevelopmentPlans(prev => [...prev, '']);
+  };
+
+  const removeDevelopmentPlan = (index: number) => {
+    if (developmentPlans.length > 1) {
+      setDevelopmentPlans(prev => prev.filter((_, i) => i !== index));
+    } else {
+      toast({
+        title: "Minimum Required",
+        description: "You must have at least 1 'Développement à envisager'.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateDevelopmentPlan = (index: number, value: string) => {
+    setDevelopmentPlans(prev => prev.map((item, i) => (i === index ? value : item)));
   };
 
   return (
@@ -634,6 +665,34 @@ export function ClientRequestForm() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* Développement à envisager */}
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg sm:text-xl font-semibold text-foreground">Développement à envisager (formation, évolution, réaffectation...) (Min. 1)</h4>
+                <Button type="button" variant="outline" size="sm" onClick={addDevelopmentPlan}>
+                  <PlusCircle className="w-4 h-4 mr-2" /> Add
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {developmentPlans.map((plan, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Textarea
+                      value={plan}
+                      onChange={(e) => updateDevelopmentPlan(index, e.target.value)}
+                      placeholder={`Développement ${index + 1}`}
+                      rows={2}
+                      className="flex-grow min-h-[60px] text-sm px-4 py-3"
+                    />
+                    {developmentPlans.length > 1 && (
+                      <Button type="button" variant="destructive" size="icon" onClick={() => removeDevelopmentPlan(index)}>
+                        <MinusCircle className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
