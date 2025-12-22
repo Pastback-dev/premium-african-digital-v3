@@ -111,6 +111,10 @@ export function ClientRequestForm() {
   const [areasToImprove, setAreasToImprove] = useState<string[]>(['', '', '']); // Min 3
   const [developmentPlans, setDevelopmentPlans] = useState<string[]>(['']); // Min 1
 
+  // New state for Manager and Collaborator comments
+  const [managerComments, setManagerComments] = useState('');
+  const [collaboratorComments, setCollaboratorComments] = useState('');
+
   const { toast } = useToast();
 
   // Calculate total for SAVOIR (sum of percentages / number of categories)
@@ -201,6 +205,8 @@ export function ClientRequestForm() {
       strongPoints: strongPoints.filter(Boolean), // Filter out empty strings
       areasToImprove: areasToImprove.filter(Boolean), // Filter out empty strings
       developmentPlans: developmentPlans.filter(Boolean), // Filter out empty strings
+      managerComments,
+      collaboratorComments,
     };
     
     console.log('Request submitted:', evaluationData);
@@ -251,6 +257,8 @@ export function ClientRequestForm() {
     setStrongPoints(['', '', '']);
     setAreasToImprove(['', '', '']);
     setDevelopmentPlans(['']);
+    setManagerComments('');
+    setCollaboratorComments('');
   };
 
   const handleRatingChange = (categoryId: string, ratingId: string, type: 'knowledge' | 'savoirFaire' | 'savoirEtre') => {
@@ -695,6 +703,32 @@ export function ClientRequestForm() {
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Appréciation globale et commentaires du Manager */}
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">Appréciation globale et commentaires du Manager</h3>
+            <Textarea
+              id="manager-comments"
+              value={managerComments}
+              onChange={(e) => setManagerComments(e.target.value)}
+              placeholder="Enter global appreciation and comments from the Manager..."
+              rows={8}
+              className="min-h-[200px] text-base px-4 py-3"
+            />
+          </div>
+
+          {/* Commentaires du collaborateur */}
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">Commentaires du collaborateur</h3>
+            <Textarea
+              id="collaborator-comments"
+              value={collaboratorComments}
+              onChange={(e) => setCollaboratorComments(e.target.value)}
+              placeholder="Enter comments from the Collaborator..."
+              rows={8}
+              className="min-h-[200px] text-base px-4 py-3"
+            />
           </div>
           
           <Button type="submit" className="w-full h-14 text-lg font-semibold">
