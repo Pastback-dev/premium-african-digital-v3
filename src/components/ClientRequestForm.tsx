@@ -5,6 +5,7 @@ import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
+import { PlusCircle, MinusCircle } from 'lucide-react'; // Import icons for add/remove
 
 // Define section coefficients
 const SAVOIR_COEFFICIENT = 0.2;
@@ -105,6 +106,10 @@ export function ClientRequestForm() {
     }, {} as Record<string, string>)
   );
 
+  // New state for Synthèse section
+  const [strongPoints, setStrongPoints] = useState<string[]>(['', '', '']); // Min 3
+  const [areasToImprove, setAreasToImprove] = useState<string[]>(['', '', '']); // Min 3
+
   const { toast } = useToast();
 
   // Calculate total for SAVOIR (sum of percentages / number of categories)
@@ -139,6 +144,24 @@ export function ClientRequestForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate minimum entries for Synthèse
+    if (strongPoints.filter(Boolean).length < 3) {
+      toast({
+        title: "Validation Error",
+        description: "Please provide at least 3 'POINTS FORTS'.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (areasToImprove.filter(Boolean).length < 3) {
+      toast({
+        title: "Validation Error",
+        description: "Please provide at least 3 'POINTS A AMELIORER'.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     // Prepare evaluation data
     const evaluationData = {
@@ -165,7 +188,9 @@ export function ClientRequestForm() {
       totalSavoir: totalSavoir.toFixed(1),
       totalSavoirFaire: totalSavoirFaire.toFixed(1),
       totalSavoirEtre: totalSavoirEtre.toFixed(1),
-      totalTenueDePoste: totalTenueDePoste.toFixed(1)
+      totalTenueDePoste: totalTenueDePoste.toFixed(1),
+      strongPoints: strongPoints.filter(Boolean), // Filter out empty strings
+      areasToImprove: areasToImprove.filter(Boolean), // Filter out empty strings
     };
     
     console.log('Request submitted:', evaluationData);
@@ -213,6 +238,8 @@ export function ClientRequestForm() {
         return acc;
       }, {} as Record<string, string>)
     );
+    setStrongPoints(['', '', '']);
+    setAreasToImprove(['', '', '']);
   };
 
   const handleRatingChange = (categoryId: string, ratingId: string, type: 'knowledge' | 'savoirFaire' | 'savoirEtre') => {
@@ -251,6 +278,46 @@ export function ClientRequestForm() {
         [categoryId]: comment
       }));
     }
+  };
+
+  const addStrongPoint = () => {
+    setStrongPoints(prev => [...prev, '']);
+  };
+
+  const removeStrongPoint = (index: number) => {
+    if (strongPoints.length > 3) {
+      setStrongPoints(prev => prev.filter((_, i) => i !== index));
+    } else {
+      toast({
+        title: "Minimum Required",
+        description: "You must have at least 3 'POINTS FORTS'.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateStrongPoint = (index: number, value: string) => {
+    setStrongPoints(prev => prev.map((item, i) => (i === index ? value : item)));
+  };
+
+  const addAreaToImprove = () => {
+    setAreasToImprove(prev => [...prev, '']);
+  };
+
+  const removeAreaToImprove = (index: number) => {
+    if (areasToImprove.length > 3) {
+      setAreasToImprove(prev => prev.filter((_, i) => i !== index));
+    } else {
+      toast({
+        title: "Minimum Required",
+        description: "You must have at least 3 'POINTS A AMELIORER'.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateAreaToImprove = (index: number, value: string) => {
+    setAreasToImprove(prev => prev.map((item, i) => (i === index ? value : item)));
   };
 
   return (
@@ -301,7 +368,6 @@ export function ClientRequestForm() {
                 <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
                   <div className="mb-4">
                     <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
-                    {/* Removed individual category coefficient display */}
                   </div>
                   
                   {/* Rating options - responsive grid */}
@@ -371,7 +437,6 @@ export function ClientRequestForm() {
                 <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
                   <div className="mb-4">
                     <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
-                    {/* Removed individual category coefficient display */}
                   </div>
                   
                   {/* Rating options - responsive grid */}
@@ -441,7 +506,6 @@ export function ClientRequestForm() {
                 <div key={category.id} className="border-b border-border pb-6 last:border-0 last:pb-0">
                   <div className="mb-4">
                     <h4 className="text-lg sm:text-xl font-semibold text-foreground">{category.name}</h4>
-                    {/* Removed individual category coefficient display */}
                   </div>
                   
                   {/* Rating options - responsive grid */}
@@ -509,6 +573,68 @@ export function ClientRequestForm() {
               <span className="font-bold text-2xl sm:text-3xl text-primary">
                 {totalTenueDePoste.toFixed(1)}%
               </span>
+            </div>
+          </div>
+
+          {/* Synthèse Section */}
+          <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+            <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">Synthèse</h3>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* POINTS FORTS */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg sm:text-xl font-semibold text-foreground">POINTS FORTS (Min. 3)</h4>
+                  <Button type="button" variant="outline" size="sm" onClick={addStrongPoint}>
+                    <PlusCircle className="w-4 h-4 mr-2" /> Add
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  {strongPoints.map((point, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Textarea
+                        value={point}
+                        onChange={(e) => updateStrongPoint(index, e.target.value)}
+                        placeholder={`Point fort ${index + 1}`}
+                        rows={2}
+                        className="flex-grow min-h-[60px] text-sm px-4 py-3"
+                      />
+                      {strongPoints.length > 3 && (
+                        <Button type="button" variant="destructive" size="icon" onClick={() => removeStrongPoint(index)}>
+                          <MinusCircle className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* POINTS A AMELIORER */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg sm:text-xl font-semibold text-foreground">POINTS A AMELIORER (Min. 3)</h4>
+                  <Button type="button" variant="outline" size="sm" onClick={addAreaToImprove}>
+                    <PlusCircle className="w-4 h-4 mr-2" /> Add
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  {areasToImprove.map((point, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Textarea
+                        value={point}
+                        onChange={(e) => updateAreaToImprove(index, e.target.value)}
+                        placeholder={`Point à améliorer ${index + 1}`}
+                        rows={2}
+                        className="flex-grow min-h-[60px] text-sm px-4 py-3"
+                      />
+                      {areasToImprove.length > 3 && (
+                        <Button type="button" variant="destructive" size="icon" onClick={() => removeAreaToImprove(index)}>
+                          <MinusCircle className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
           
