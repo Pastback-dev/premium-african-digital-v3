@@ -27,10 +27,9 @@ interface Evaluation {
     entry_date: string;
     seniority_date: string;
   } | null;
-  // Include other evaluation fields if needed for display
-  knowledge_evaluations: any;
-  savoir_faire_evaluations: any;
-  savoir_etre_evaluations: any;
+  knowledge_evaluations: Array<{ category: string; rating: string; comment: string; percentage: number }>;
+  savoir_faire_evaluations: Array<{ category: string; rating: string; comment: string; percentage: number }>;
+  savoir_etre_evaluations: Array<{ category: string; rating: string; comment: string; percentage: number }>;
   total_savoir: number;
   total_savoir_faire: number;
   total_savoir_etre: number;
@@ -121,6 +120,37 @@ const EvaluationDetailsForm: React.FC<EvaluationDetailsFormProps> = ({ evaluatio
   const evaluationYear = new Date(evaluation.created_at).getFullYear();
   const evaluationDate = new Date(evaluation.created_at).toLocaleDateString();
 
+  const renderEvaluationSection = (title: string, evaluations: Array<{ category: string; rating: string; comment: string; percentage: number }>, totalScore: number) => (
+    <div className="border rounded-lg p-6 bg-secondary/20">
+      <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">{title}</h3>
+      <div className="space-y-8">
+        {evaluations.map((item, index) => (
+          <div key={index} className="border-b border-border pb-6 last:border-0 last:pb-0">
+            <h4 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{item.category}</h4>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <Label className="block text-sm font-medium text-muted-foreground mb-1">Rating</Label>
+                <p className="text-lg font-semibold text-foreground">{item.rating} ({item.percentage}%)</p>
+              </div>
+              <div>
+                <Label className="block text-sm font-medium text-muted-foreground mb-1">Commentary</Label>
+                <p className="text-muted-foreground text-sm">{item.comment || 'No comment provided.'}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 pt-4 border-t border-border">
+        <div className="flex justify-between items-center">
+          <span className="font-semibold text-lg text-foreground">Total {title.split(' ')[0]}:</span>
+          <span className="font-bold text-xl sm:text-2xl text-primary">
+            {totalScore.toFixed(1)}%
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <Card className="p-6 sm:p-8 lg:p-10">
       <CardHeader className="mb-8">
@@ -196,6 +226,82 @@ const EvaluationDetailsForm: React.FC<EvaluationDetailsFormProps> = ({ evaluatio
         <Button onClick={handleSaveEvaluatorDetails} className="w-full h-12 text-lg">
           Save Evaluator Details
         </Button>
+
+        {/* Display core evaluation sections */}
+        {renderEvaluationSection("SAVOIR (Knowledge)", evaluation.knowledge_evaluations, evaluation.total_savoir)}
+        {renderEvaluationSection("SAVOIR FAIRE (Know-how / Skills)", evaluation.savoir_faire_evaluations, evaluation.total_savoir_faire)}
+        {renderEvaluationSection("SAVOIR ÊTRE (Attitude / Soft Skills)", evaluation.savoir_etre_evaluations, evaluation.total_savoir_etre)}
+
+        {/* TOTAL TENUE DE POSTE Section */}
+        <div className="border rounded-lg p-6 sm:p-8 bg-primary/10">
+          <div className="flex justify-between items-center">
+            <h3 className="text-xl sm:text-2xl font-bold text-foreground">TOTAL TENUE DE POSTE:</h3>
+            <span className="font-bold text-2xl sm:text-3xl text-primary">
+              {evaluation.total_tenue_de_poste?.toFixed(1) || 'N/A'}%
+            </span>
+          </div>
+        </div>
+
+        {/* Synthèse Section */}
+        <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+          <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">Synthèse</h3>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 className="text-lg sm:text-xl font-semibold text-foreground mb-4">POINTS FORTS</h4>
+              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                {evaluation.strong_points && evaluation.strong_points.length > 0 ? (
+                  evaluation.strong_points.map((point, index) => <li key={index}>{point}</li>)
+                ) : (
+                  <li>No strong points provided.</li>
+                )}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-lg sm:text-xl font-semibold text-foreground mb-4">POINTS A AMELIORER</h4>
+              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                {evaluation.areas_to_improve && evaluation.areas_to_improve.length > 0 ? (
+                  evaluation.areas_to_improve.map((area, index) => <li key={index}>{area}</li>)
+                ) : (
+                  <li>No areas to improve provided.</li>
+                )}
+              </ul>
+            </div>
+          </div>
+          <div className="mt-8">
+            <h4 className="text-lg sm:text-xl font-semibold text-foreground mb-4">Développement à envisager (formation, évolution, réaffectation...)</h4>
+            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+              {evaluation.development_plans && evaluation.development_plans.length > 0 ? (
+                evaluation.development_plans.map((plan, index) => <li key={index}>{plan}</li>)
+              ) : (
+                <li>No development plans provided.</li>
+              )}
+            </ul>
+          </div>
+        </div>
+
+        {/* Appréciation globale et commentaires du Manager */}
+        <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+          <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">Appréciation globale et commentaires du Manager</h3>
+          <Textarea
+            id="manager-comments"
+            value={evaluation.manager_comments || 'No manager comments provided.'}
+            readOnly
+            rows={8}
+            className="min-h-[200px] text-base px-4 py-3 bg-card cursor-default"
+          />
+        </div>
+
+        {/* Commentaires du collaborateur */}
+        <div className="border rounded-lg p-6 sm:p-8 bg-secondary/20">
+          <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">Commentaires du collaborateur</h3>
+          <Textarea
+            id="collaborator-comments"
+            value={evaluation.collaborator_comments || 'No collaborator comments provided.'}
+            readOnly
+            rows={8}
+            className="min-h-[200px] text-base px-4 py-3 bg-card cursor-default"
+          />
+        </div>
       </CardContent>
     </Card>
   );
