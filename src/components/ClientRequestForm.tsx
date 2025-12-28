@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -67,7 +67,7 @@ const ratingLevels = [
 ];
 
 export function ClientRequestForm() {
-  const { session } = useSession(); // Get session from context
+  const { session, loading: sessionLoading } = useSession(); // Get session from context
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [knowledgeRatings, setKnowledgeRatings] = useState(
@@ -118,7 +118,38 @@ export function ClientRequestForm() {
   const [managerComments, setManagerComments] = useState('');
   const [collaboratorComments, setCollaboratorComments] = useState('');
 
+  const [hasSubmittedEvaluation, setHasSubmittedEvaluation] = useState(false);
+  const [formLoading, setFormLoading] = useState(true);
+
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkIfEvaluated = async () => {
+      if (session?.user?.id) {
+        const { data, error } = await supabase
+          .from('evaluations')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .limit(1);
+
+        if (error) {
+          console.error('Error checking for existing evaluation:', error.message);
+          toast({
+            title: "Error",
+            description: "Could not check for existing evaluations.",
+            variant: "destructive",
+          });
+        } else if (data && data.length > 0) {
+          setHasSubmittedEvaluation(true);
+        }
+      }
+      setFormLoading(false);
+    };
+
+    if (!sessionLoading) {
+      checkIfEvaluated();
+    }
+  }, [session, sessionLoading, toast]);
 
   // Calculate total for SAVOIR (sum of percentages / number of categories)
   const totalSavoirSum = knowledgeCategories.reduce((total, category) => {
@@ -152,6 +183,15 @@ export function ClientRequestForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (hasSubmittedEvaluation) {
+      toast({
+        title: "Submission Restricted",
+        description: "You have already submitted an evaluation.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (!session?.user?.id) {
       toast({
@@ -236,6 +276,7 @@ export function ClientRequestForm() {
         title: "Request Submitted", 
         description: "Your evaluation has been sent successfully." 
       });
+      setHasSubmittedEvaluation(true); // Mark as submitted
       
       // Reset form
       setSubject('');
@@ -381,6 +422,32 @@ export function ClientRequestForm() {
   const updateDevelopmentPlan = (index: number, value: string) => {
     setDevelopmentPlans(prev => prev.map((item, i) => (i === index ? value : item)));
   };
+
+  if (sessionLoading || formLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-muted-foreground">Loading evaluation status...</p>
+      </div>
+    );
+  }
+
+  if (hasSubmittedEvaluation) {
+    return (
+      <Card className="p-6 sm:p-8 lg:p-10 max-w-4xl mx-auto text-center">
+        <CardHeader className="mb-8">
+          <CardTitle className="text-3xl sm:text-4xl font-bold text-foreground">Evaluation Submitted</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-lg text-muted-foreground mb-4">
+            You have already submitted your performance evaluation.
+          </p>
+          <p className="text-muted-foreground">
+            If you believe this is an error, please contact support.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl mx-auto py-8">
@@ -754,7 +821,7 @@ export function ClientRequestForm() {
             />
           </div>
           
-          <Button type="submit" className="w-full h-14 text-lg font-semibold">
+          <Button type="submit" className="w-full h-14 text-lg font-semibold" disabled={hasSubmittedEvaluation}>
             Submit Evaluation
           </Button>
         </CardContent>
