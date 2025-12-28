@@ -1,10 +1,77 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
+import EvaluationDetailsForm from '@/components/EvaluationDetailsForm'; // Import the new component
+
+interface Evaluation {
+  id: string;
+  user_id: string;
+  subject: string;
+  description: string;
+  created_at: string;
+  evaluator1_details: {
+    name: string;
+    function: string;
+    category: string;
+    entry_date: string;
+    seniority_date: string;
+  } | null;
+  evaluator2_details: {
+    name: string;
+    function: string;
+    category: string;
+    entry_date: string;
+    seniority_date: string;
+  } | null;
+  // Include other evaluation fields if needed for display
+  knowledge_evaluations: any;
+  savoir_faire_evaluations: any;
+  savoir_etre_evaluations: any;
+  total_savoir: number;
+  total_savoir_faire: number;
+  total_savoir_etre: number;
+  total_tenue_de_poste: number;
+  strong_points: string[];
+  areas_to_improve: string[];
+  development_plans: string[];
+  manager_comments: string;
+  collaborator_comments: string;
+}
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedEvaluation, setSelectedEvaluation] = useState<Evaluation | null>(null);
+
+  const fetchEvaluations = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('evaluations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching evaluations:', error.message);
+      toast({
+        title: "Error",
+        description: "Failed to load evaluations.",
+        variant: "destructive",
+      });
+    } else {
+      setEvaluations(data as Evaluation[]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchEvaluations();
+  }, []);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -13,6 +80,10 @@ const AdminDashboard = () => {
     } else {
       navigate('/login');
     }
+  };
+
+  const handleSelectEvaluation = (evaluation: Evaluation) => {
+    setSelectedEvaluation(evaluation);
   };
 
   return (
@@ -25,23 +96,57 @@ const AdminDashboard = () => {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="p-6 border border-border rounded-lg bg-card">
-            <h2 className="text-2xl font-semibold mb-4">User Management</h2>
-            <p className="text-muted-foreground mb-4">Manage users, roles, and permissions</p>
-            <Button variant="outline">View Users</Button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Panel: List of Evaluations */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle>Client Evaluations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <p className="text-muted-foreground">Loading evaluations...</p>
+                ) : evaluations.length === 0 ? (
+                  <p className="text-muted-foreground">No evaluations found.</p>
+                ) : (
+                  <div className="max-h-[70vh] overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Subject</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Total Score</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {evaluations.map((evaluation) => (
+                          <TableRow 
+                            key={evaluation.id} 
+                            onClick={() => handleSelectEvaluation(evaluation)}
+                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          >
+                            <TableCell className="font-medium">{evaluation.subject}</TableCell>
+                            <TableCell>{new Date(evaluation.created_at).toLocaleDateString()}</TableCell>
+                            <TableCell>{evaluation.total_tenue_de_poste?.toFixed(1) || 'N/A'}%</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
-          
-          <div className="p-6 border border-border rounded-lg bg-card">
-            <h2 className="text-2xl font-semibold mb-4">Requests</h2>
-            <p className="text-muted-foreground mb-4">View and manage client requests</p>
-            <Button variant="outline">View Requests</Button>
-          </div>
-          
-          <div className="p-6 border border-border rounded-lg bg-card">
-            <h2 className="text-2xl font-semibold mb-4">Analytics</h2>
-            <p className="text-muted-foreground mb-4">View platform usage and metrics</p>
-            <Button variant="outline">View Analytics</Button>
+
+          {/* Right Panel: Evaluation Details Form */}
+          <div className="lg:col-span-2">
+            {selectedEvaluation ? (
+              <EvaluationDetailsForm evaluation={selectedEvaluation} onUpdate={fetchEvaluations} />
+            ) : (
+              <Card className="p-6 sm:p-8 lg:p-10 text-center flex items-center justify-center min-h-[500px]">
+                <p className="text-muted-foreground text-lg">Select an evaluation from the left to view details.</p>
+              </Card>
+            )}
           </div>
         </div>
       </div>
