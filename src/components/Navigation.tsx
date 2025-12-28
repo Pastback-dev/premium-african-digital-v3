@@ -28,7 +28,12 @@ export const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const dashboardLink = userRole === 'admin' ? '/dashboard/admin' : '/dashboard/client';
+  let dashboardLink = '/dashboard/client'; // Default
+  if (userRole === 'admin') {
+    dashboardLink = '/dashboard/admin';
+  } else if (userRole === 'responsable') { // New role link
+    dashboardLink = '/dashboard/responsable';
+  }
 
   return (
     <motion.header

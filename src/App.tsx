@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import { SessionProvider } from "./components/SessionProvider";
 import ClientDashboard from "./pages/ClientDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import ResponsableDashboard from "./pages/ResponsableDashboard"; // Import the new dashboard
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/dashboard/client" element={<ClientDashboard />} />
               <Route path="/dashboard/admin" element={<AdminDashboard />} />
+              <Route path="/dashboard/responsable" element={<ResponsableDashboard />} /> {/* New route */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

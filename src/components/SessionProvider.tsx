@@ -45,6 +45,8 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
           navigate('/dashboard/admin');
         } else if (role === 'client') {
           navigate('/dashboard/client');
+        } else if (role === 'responsable') { // New role redirection
+          navigate('/dashboard/responsable');
         }
       }
       
@@ -67,6 +69,8 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
           navigate('/dashboard/admin');
         } else if (role === 'client') {
           navigate('/dashboard/client');
+        } else if (role === 'responsable') { // New role redirection
+          navigate('/dashboard/responsable');
         } else {
           // Default redirect if role not found
           navigate('/dashboard/client');
