@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Label } from './ui/label';
-import { PlusCircle, MinusCircle } from 'lucide-react'; // Import icons for add/remove
+import { PlusCircle, MinusCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client'; // Import supabase client
+import { useSession } from './SessionProvider'; // Import useSession to get user_id
 
 // Define section coefficients
 const SAVOIR_COEFFICIENT = 0.2;
@@ -65,6 +67,7 @@ const ratingLevels = [
 ];
 
 export function ClientRequestForm() {
+  const { session } = useSession(); // Get session from context
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
   const [knowledgeRatings, setKnowledgeRatings] = useState(
@@ -147,8 +150,17 @@ export function ClientRequestForm() {
     (totalSavoirFaire * SAVOIR_FAIRE_COEFFICIENT) + 
     (totalSavoirEtre * SAVOIR_ETRE_COEFFICIENT);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!session?.user?.id) {
+      toast({
+        title: "Authentication Error",
+        description: "You must be logged in to submit an evaluation.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Validate minimum entries for Synthèse
     if (strongPoints.filter(Boolean).length < 3) {
@@ -176,89 +188,100 @@ export function ClientRequestForm() {
       return;
     }
     
-    // Prepare evaluation data
+    // Prepare evaluation data for Supabase
     const evaluationData = {
+      user_id: session.user.id,
       subject,
       description,
-      knowledgeEvaluations: knowledgeCategories.map(category => ({
+      knowledge_evaluations: knowledgeCategories.map(category => ({
         category: category.name,
         rating: knowledgeRatings[category.id],
         comment: knowledgeComments[category.id],
         percentage: ratingLevels.find(r => r.id === knowledgeRatings[category.id])?.value || 0
       })),
-      savoirFaireEvaluations: savoirFaireCategories.map(category => ({
+      savoir_faire_evaluations: savoirFaireCategories.map(category => ({
         category: category.name,
         rating: savoirFaireRatings[category.id],
         comment: savoirFaireComments[category.id],
         percentage: ratingLevels.find(r => r.id === savoirFaireRatings[category.id])?.value || 0
       })),
-      savoirEtreEvaluations: savoirEtreCategories.map(category => ({
+      savoir_etre_evaluations: savoirEtreCategories.map(category => ({
         category: category.name,
         rating: savoirEtreRatings[category.id],
         comment: savoirEtreComments[category.id],
         percentage: ratingLevels.find(r => r.id === savoirEtreRatings[category.id])?.value || 0
       })),
-      totalSavoir: totalSavoir.toFixed(1),
-      totalSavoirFaire: totalSavoirFaire.toFixed(1),
-      totalSavoirEtre: totalSavoirEtre.toFixed(1),
-      totalTenueDePoste: totalTenueDePoste.toFixed(1),
-      strongPoints: strongPoints.filter(Boolean), // Filter out empty strings
-      areasToImprove: areasToImprove.filter(Boolean), // Filter out empty strings
-      developmentPlans: developmentPlans.filter(Boolean), // Filter out empty strings
-      managerComments,
-      collaboratorComments,
+      total_savoir: parseFloat(totalSavoir.toFixed(1)),
+      total_savoir_faire: parseFloat(totalSavoirFaire.toFixed(1)),
+      total_savoir_etre: parseFloat(totalSavoirEtre.toFixed(1)),
+      total_tenue_de_poste: parseFloat(totalTenueDePoste.toFixed(1)),
+      strong_points: strongPoints.filter(Boolean), // Filter out empty strings
+      areas_to_improve: areasToImprove.filter(Boolean), // Filter out empty strings
+      development_plans: developmentPlans.filter(Boolean), // Filter out empty strings
+      manager_comments: managerComments,
+      collaborator_comments: collaboratorComments,
     };
     
-    console.log('Request submitted:', evaluationData);
-    toast({ 
-      title: "Request Submitted", 
-      description: "Your request has been sent successfully." 
-    });
-    
-    // Reset form
-    setSubject('');
-    setDescription('');
-    setKnowledgeRatings(
-      knowledgeCategories.reduce((acc, category) => {
-        acc[category.id] = '';
-        return acc;
-      }, {} as Record<string, string>)
-    );
-    setKnowledgeComments(
-      knowledgeCategories.reduce((acc, category) => {
-        acc[category.id] = '';
-        return acc;
-      }, {} as Record<string, string>)
-    );
-    setSavoirFaireRatings(
-      savoirFaireCategories.reduce((acc, category) => {
-        acc[category.id] = '';
-        return acc;
-      }, {} as Record<string, string>)
-    );
-    setSavoirFaireComments(
-      savoirFaireCategories.reduce((acc, category) => {
-        acc[category.id] = '';
-        return acc;
-      }, {} as Record<string, string>)
-    );
-    setSavoirEtreRatings(
-      savoirEtreCategories.reduce((acc, category) => {
-        acc[category.id] = '';
-        return acc;
-      }, {} as Record<string, string>)
-    );
-    setSavoirEtreComments(
-      savoirEtreCategories.reduce((acc, category) => {
-        acc[category.id] = '';
-        return acc;
-      }, {} as Record<string, string>)
-    );
-    setStrongPoints(['', '', '']);
-    setAreasToImprove(['', '', '']);
-    setDevelopmentPlans(['']);
-    setManagerComments('');
-    setCollaboratorComments('');
+    const { error } = await supabase.from('evaluations').insert([evaluationData]);
+
+    if (error) {
+      console.error('Error submitting evaluation:', error);
+      toast({
+        title: "Submission Failed",
+        description: `There was an error submitting your evaluation: ${error.message}`,
+        variant: "destructive",
+      });
+    } else {
+      toast({ 
+        title: "Request Submitted", 
+        description: "Your evaluation has been sent successfully." 
+      });
+      
+      // Reset form
+      setSubject('');
+      setDescription('');
+      setKnowledgeRatings(
+        knowledgeCategories.reduce((acc, category) => {
+          acc[category.id] = '';
+          return acc;
+        }, {} as Record<string, string>)
+      );
+      setKnowledgeComments(
+        knowledgeCategories.reduce((acc, category) => {
+          acc[category.id] = '';
+          return acc;
+        }, {} as Record<string, string>)
+      );
+      setSavoirFaireRatings(
+        savoirFaireCategories.reduce((acc, category) => {
+          acc[category.id] = '';
+          return acc;
+        }, {} as Record<string, string>)
+      );
+      setSavoirFaireComments(
+        savoirFaireCategories.reduce((acc, category) => {
+          acc[category.id] = '';
+          return acc;
+        }, {} as Record<string, string>)
+      );
+      setSavoirEtreRatings(
+        savoirEtreCategories.reduce((acc, category) => {
+          acc[category.id] = '';
+          return acc;
+        }, {} as Record<string, string>)
+      );
+      setSavoirEtreComments(
+        savoirEtreCategories.reduce((acc, category) => {
+          acc[category.id] = '';
+          return acc;
+        }, {} as Record<string, string>)
+      );
+      setStrongPoints(['', '', '']);
+      setAreasToImprove(['', '', '']);
+      setDevelopmentPlans(['']);
+      setManagerComments('');
+      setCollaboratorComments('');
+    }
   };
 
   const handleRatingChange = (categoryId: string, ratingId: string, type: 'knowledge' | 'savoirFaire' | 'savoirEtre') => {
