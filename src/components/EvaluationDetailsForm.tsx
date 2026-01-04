@@ -39,6 +39,9 @@ interface Evaluation {
   development_plans: string[];
   manager_comments: string;
   collaborator_comments: string;
+  responsable_savoir_notes?: string[]; // New field
+  responsable_savoir_faire_notes?: string[]; // New field
+  responsable_savoir_etre_notes?: string[]; // New field
 }
 
 interface EvaluationDetailsFormProps {
@@ -151,6 +154,19 @@ const EvaluationDetailsForm: React.FC<EvaluationDetailsFormProps> = ({ evaluatio
     </div>
   );
 
+  const renderResponsableNotesSection = (title: string, notes?: string[]) => (
+    <div className="border rounded-lg p-6 bg-secondary/20">
+      <h3 className="text-xl sm:text-2xl font-bold mb-6 text-foreground">{title} (Responsable Notes)</h3>
+      <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+        {notes && notes.length > 0 && notes.filter(Boolean).length > 0 ? (
+          notes.filter(Boolean).map((note, index) => <li key={index}>{note}</li>)
+        ) : (
+          <li>No responsable notes provided.</li>
+        )}
+      </ul>
+    </div>
+  );
+
   return (
     <Card className="p-6 sm:p-8 lg:p-10">
       <CardHeader className="mb-8">
@@ -231,6 +247,12 @@ const EvaluationDetailsForm: React.FC<EvaluationDetailsFormProps> = ({ evaluatio
         {renderEvaluationSection("SAVOIR (Knowledge)", evaluation.knowledge_evaluations, evaluation.total_savoir)}
         {renderEvaluationSection("SAVOIR FAIRE (Know-how / Skills)", evaluation.savoir_faire_evaluations, evaluation.total_savoir_faire)}
         {renderEvaluationSection("SAVOIR ÊTRE (Attitude / Soft Skills)", evaluation.savoir_etre_evaluations, evaluation.total_savoir_etre)}
+
+        {/* Display Responsable Notes */}
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-foreground">Tenue de poste Notes (Responsable)</h2>
+        {renderResponsableNotesSection("Savoir", evaluation.responsable_savoir_notes)}
+        {renderResponsableNotesSection("Savoir Faire", evaluation.responsable_savoir_faire_notes)}
+        {renderResponsableNotesSection("Savoir Être", evaluation.responsable_savoir_etre_notes)}
 
         {/* TOTAL TENUE DE POSTE Section */}
         <div className="border rounded-lg p-6 sm:p-8 bg-primary/10">
